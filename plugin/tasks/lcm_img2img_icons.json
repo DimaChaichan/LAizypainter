@@ -1,0 +1,191 @@
+{
+  "config": {
+    "uploadSize": 1024,
+    "mode": "loop"
+  },
+  "variables": {
+    "positive": {
+      "type": "textarea",
+      "value": "potion,4k,realistic,phograph,black background,simple background,game icon",
+      "label": "Positive Prompt:"
+    },
+    "negative": {
+      "type": "text",
+      "value": "watermark, text, too simple composition, boring composition",
+      "label": "Negative Prompt:"
+    },
+    "row1": {
+      "type": "row",
+      "seed": {
+        "type": "seed",
+        "value": "random",
+        "label": "Seed:"
+      },
+      "denoise": {
+        "type": "slider",
+        "value": 0.8,
+        "min": 0.01,
+        "max": 1,
+        "step": 0.01,
+        "mapMax": 1,
+        "label": "AI Freedom (Denoise):"
+      }
+    },
+    "row2": {
+      "type": "row",
+      "model": {
+        "type": "model",
+        "value": "sd_xl_base_1.0.safetensors",
+        "label": "Model:"
+      },
+      "lora": {
+        "type": "lora",
+        "value": "lcm_lora_weights.safetensors",
+        "label": "LCM Lora:"
+      },
+      "lora_icon": {
+        "type": "lora",
+        "value": "game_icon_diablo_style.safetensors",
+        "label": "Icon Lora:"
+      }
+    }
+  },
+  "prompt": {
+    "3": {
+      "inputs": {
+        "seed": "#seed#",
+        "steps": 5,
+        "cfg": 1.5,
+        "sampler_name": "lcm",
+        "scheduler": "normal",
+        "denoise": "#denoise#",
+        "model": [
+          "10",
+          0
+        ],
+        "positive": [
+          "6",
+          0
+        ],
+        "negative": [
+          "7",
+          0
+        ],
+        "latent_image": [
+          "13",
+          0
+        ]
+      },
+      "class_type": "KSampler"
+    },
+    "4": {
+      "inputs": {
+        "ckpt_name": "#model#"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
+    "5": {
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage"
+    },
+    "6": {
+      "inputs": {
+        "text": "#positive#",
+        "clip": [
+          "10",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "7": {
+      "inputs": {
+        "text": "#negative#",
+        "clip": [
+          "10",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "8": {
+      "inputs": {
+        "samples": [
+          "3",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "class_type": "VAEDecode"
+    },
+    "9": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "8",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "10": {
+      "inputs": {
+        "lora_name": "#lora#",
+        "strength_model": 1,
+        "strength_clip": 1,
+        "model": [
+          "11",
+          0
+        ],
+        "clip": [
+          "11",
+          1
+        ]
+      },
+      "class_type": "LoraLoader"
+    },
+    "11": {
+      "inputs": {
+        "lora_name": "#lora_icon#",
+        "strength_model": 1,
+        "strength_clip": 1,
+        "model": [
+          "4",
+          0
+        ],
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "class_type": "LoraLoader"
+    },
+    "12": {
+      "inputs": {
+        "image": "#image#",
+        "choose file to upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "13": {
+      "inputs": {
+        "pixels": [
+          "12",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "class_type": "VAEEncode"
+    }
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "id": "com.demeter.chaichan.laizypainter",
+  "name": "LAizypainter",
+  "version": "0.0.1",
+  "main": "index.js",
+  "manifestVersion": 5,
+  "host": [
+    {
+      "app": "PS",
+      "minVersion": "25.0.0"
+    }
+  ],
+  "requiredPermissions": {
+    "allowCodeGenerationFromStrings": true,
+    "localFileSystem": "fullAccess",
+    "network": {
+      "domains": "all"
+    }
+  },
+  "entrypoints": [
+    {
+      "type": "command",
+      "id": "reload",
+      "label": {
+        "default": "Reload Plugin"
+      }
+    },
+    {
+      "type": "panel",
+      "id": "main",
+      "label": {
+        "default": "LAizypainter"
+      },
+      "minimumSize": {
+        "width": 300,
+        "height": 200
+      },
+      "maximumSize": {
+        "width": 2000,
+        "height": 2000
+      },
+      "preferredDockedSize": {
+        "width": 300,
+        "height": 400
+      },
+      "preferredFloatingSize": {
+        "width": 300,
+        "height": 400
+      },
+      "icons": [
+        {
+          "width": 24,
+          "height": 24,
+          "path": "icons/icon_D.png",
+          "scale": [
+            1,
+            2
+          ],
+          "theme": [
+            "dark",
+            "darkest"
+          ],
+          "species": [
+            "generic"
+          ]
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "path": "icons/icon_N.png",
+          "scale": [
+            1,
+            2
+          ],
+          "theme": [
+            "lightest",
+            "light"
+          ],
+          "species": [
+            "generic"
+          ]
+        }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "width": 48,
+      "height": 48,
+      "path": "icons/icon_D.png",
+      "scale": [
+        1,
+        2
+      ],
+      "theme": [
+        "dark",
+        "darkest"
+      ],
+      "species": [
+        "generic"
+      ]
+    },
+    {
+      "width": 48,
+      "height": 48,
+      "path": "icons/icon_N.png",
+      "scale": [
+        1,
+        2
+      ],
+      "theme": [
+        "lightest",
+        "light"
+      ],
+      "species": [
+        "generic"
+      ]
+    }
+  ]
+}

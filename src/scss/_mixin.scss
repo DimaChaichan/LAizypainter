@@ -1,0 +1,93 @@
+@import "_variables.scss";
+
+// Theme Mixins
+@mixin theme-text-color {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    color: $text-color-darkest;
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    color: $text-color-dark;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    color: $text-color-lightest;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    color: $text-color-light;
+  }
+}
+
+@mixin theme-border-color {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    border-color: $border-color-darkest;
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    border-color: $border-color-dark;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    border-color: $border-color-lightest;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    border-color: $border-color-light;
+  }
+}
+
+@mixin theme-border-color-selected {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    border-color: $border-color-selected-darkest !important;
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    border-color: $border-color-selected-dark !important;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    border-color: $border-color-selected-lightest !important;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    border-color: $border-color-selected-light !important;
+  }
+}
+
+
+@mixin theme-background {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    background-color: $background-darkest;
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    background-color: $background-dark;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    background-color: $background-lightest;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    background-color: $background-light;
+  }
+}
+
+@mixin theme-background-selected {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    background-color: lighten($background-darkest, 5%);
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    background-color: lighten($background-dark, 5%);
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    background-color: lighten($background-lightest, 5%);
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    background-color: lighten($background-light, 5%);
+  }
+}
+
+@mixin theme-warning-color {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    color: $warning-darkest;
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    color: $warning-dark;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    color: $warning-lightest;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    color: $warning-light;
+  }
+}

@@ -1,0 +1,60 @@
+@import '../../scss/_mixin.scss';
+
+.collapse-container-selected-bg {
+  background: white;
+  @include theme-background-selected;
+}
+
+.collapse-container {
+  padding: 2px;
+  margin: 0 2px;
+  border: 1px solid;
+  border-radius: 5px;
+  @include theme-border-color;
+  overflow: auto;
+  min-height: 35px;
+
+  .collapse-container-header {
+    display: flex;
+    cursor: pointer;
+    border-radius: 5px;
+
+    .collapse-container-header-label {
+      padding-left: 10px;
+      font-weight: bold;
+    }
+  }
+
+  .collapse-container-header-selected {
+    @include theme-border-color-selected;
+    @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+      background-color: lighten($background-darkest, 15%) !important;
+    }
+    @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+      background-color: lighten($background-dark, 20%) !important;
+    }
+    @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+      background-color: darken($background-lightest, 5%) !important;
+    }
+    @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+      background-color: lighten($background-light, 20%) !important;
+    }
+  }
+
+  .collapse-container-children {
+
+  }
+
+  .collapse-container-children-close {
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: none !important;
+
+    sp-textfield {
+      display: none !important;
+    }
+  }
+}
