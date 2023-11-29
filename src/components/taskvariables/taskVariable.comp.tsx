@@ -7,12 +7,53 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
     const state = useContext(AppState);
 
     let comp = null;
+    let valid = true;
+    const serVariable = (value: any, rerun: boolean, timer?: number) => {
+        state.taskVariablesFlat.value[props.name] = value;
+        if (rerun)
+            state.rerunTask(timer);
+    }
+    const valueExistInMenu = (menu: Array<string>) => {
+        if (!menu.some(model => model === state.taskVariablesFlat.value[props.name])) {
+            state.taskVariablesFlat.value[props.name] = undefined;
+            return false;
+        }
+        return true;
+    }
+
+    const handleCheckboxChange = (event: any) => {
+        serVariable(event.target.checked, true);
+    };
+    const handleTextInput = (event: any) => {
+        serVariable(event.target.value, true, 3000);
+    };
+    const handleOnChangesMenuCombo = (event: any) => {
+        event.target.parentElement.removeAttribute('invalid')
+        serVariable(event.target.value, true);
+    }
+    const handleNumberInput = (event: any) => {
+        let newVal = event.target.value;
+        newVal = parseFloat(newVal.replace(",", "."))
+
+        if (!newVal) {
+            event.target.setAttribute('invalid', true)
+        } else {
+            event.target.removeAttribute('invalid')
+        }
+
+        state.reRenderTaskVariables();
+        serVariable(newVal, true, 2500);
+    };
+
+    const handleSliderInput = (event: any) => {
+        serVariable(event.target.value, true, 1000);
+    };
+
     switch (props.variable.type) {
         case "bool":
-            const handleCheckboxChange = (event: any) => {
-                state.taskVariablesFlat.value[props.name] = event.target.checked;
-                state.rerunTask();
-            };
+            if (typeof state.taskVariablesFlat.value[props.name] !== "boolean") {
+                state.taskVariablesFlat.value[props.name] = false;
+            }
             comp = (<sp-checkbox
                 checked={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name] : false}
                 onChange={handleCheckboxChange}
@@ -21,10 +62,6 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
             </sp-checkbox>)
             break;
         case "text":
-            const handleTextInput = (event: any) => {
-                state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask(3000);
-            };
             comp = (<sp-textfield
                 value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                 onInput={handleTextInput}
@@ -34,45 +71,28 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
                 </sp-label>
             </sp-textfield>)
             break;
+        case "textarea":
+            comp = (<sp-textarea className="theme-border"
+                                 onInput={handleTextInput}
+                                 value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
+                                 style={{width: "100%"}}>
+                <sp-label slot="label"
+                          className="theme-text">{props.label}
+                </sp-label>
+            </sp-textarea>)
+            break;
         case "int":
-            const handleIntInput = (event: any) => {
-                let newVal = event.target.value;
-                newVal = parseFloat(newVal)
-
-                if (!newVal) {
-                    event.target.setAttribute('invalid', true)
-                } else {
-                    event.target.removeAttribute('invalid')
-                }
-
-                state.taskVariablesFlat.value[props.name] = newVal;
-                state.reRenderTaskVariables();
-                state.rerunTask(2500);
-            };
             comp = (<sp-textfield className="theme-border"
                                   invalid={state.taskVariablesFlat.value[props.name] ? null : true}
                                   value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                                   style={{width: "100%"}}
-                                  onInput={handleIntInput}>
+                                  onInput={handleNumberInput}>
                 <sp-label slot="label"
                           className="theme-text">{props.label}
                 </sp-label>
             </sp-textfield>)
             break;
         case "number":
-            const handleNumberInput = (event: any) => {
-                let newVal = event.target.value;
-                newVal = parseFloat(newVal.replace(",", "."))
-
-                if (!newVal) {
-                    event.target.setAttribute('invalid', true)
-                } else {
-                    event.target.removeAttribute('invalid')
-                }
-
-                state.taskVariablesFlat.value[props.name] = newVal;
-                state.rerunTask(2500);
-            };
             comp = (<sp-textfield type="number" className="theme-border"
                                   invalid={state.taskVariablesFlat.value[props.name] ? null : true}
                                   value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
@@ -86,20 +106,6 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
         case "seed":
             if (state.taskVariablesFlat.value[props.name] === "random")
                 state.taskVariablesFlat.value[props.name] = randomSeed();
-            const handleSeedInput = (event: any) => {
-                let newVal = event.target.value;
-                newVal = parseFloat(newVal.replace(",", "."))
-
-                if (!newVal) {
-                    event.target.setAttribute('invalid', true)
-                } else {
-                    event.target.removeAttribute('invalid')
-                }
-
-                state.taskVariablesFlat.value[props.name] = newVal;
-                state.reRenderTaskVariables();
-                state.rerunTask(2000);
-            };
             const handleSeedRandomClick = () => {
                 state.taskVariablesFlat.value[props.name] = randomSeed();
                 state.reRenderTaskVariables();
@@ -111,7 +117,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
                                   invalid={state.taskVariablesFlat.value[props.name] ? null : true}
                                   value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                                   style={{width: "100%"}}
-                                  onInput={handleSeedInput}>
+                                  onInput={handleNumberInput}>
                         <sp-label slot="label"
                                   className="theme-text">{props.label}
                         </sp-label>
@@ -129,25 +135,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
                     </sp-action-button>
                 </div>)
             break;
-        case "textarea":
-            const handleTextAreaInput = (event: any) => {
-                state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask(3000);
-            };
-            comp = (<sp-textarea className="theme-border"
-                                 onInput={handleTextAreaInput}
-                                 value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
-                                 style={{width: "100%"}}>
-                <sp-label slot="label"
-                          className="theme-text">{props.label}
-                </sp-label>
-            </sp-textarea>)
-            break;
         case "slider":
-            const handleSliderInput = (event: any) => {
-                state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask(1000);
-            };
             comp = (<sp-slider
                 onInput={handleSliderInput}
                 min={props.variable.min ? props.variable.min : 0}
@@ -160,17 +148,17 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
             break;
         case "model":
             const menuModels: MutableRef<any> = useRef(null);
-            const handleOnChange = (event: any) => {
-                state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask();
-            }
+            if (!valueExistInMenu(state.models.value))
+                valid = false;
+
             useEffect(() => {
-                menuModels.current?.addEventListener("change", handleOnChange);
+                menuModels.current?.addEventListener("change", handleOnChangesMenuCombo);
                 return () => {
-                    menuModels.current?.removeEventListener("change", handleOnChange);
+                    menuModels.current?.removeEventListener("change", handleOnChangesMenuCombo);
                 };
             },)
             comp = (<sp-picker
+                invalid={valid ? null : true}
                 style={{width: "100%"}}>
                 <sp-menu slot="options" ref={menuModels}>
                     {state.models.value.map(model =>
@@ -187,17 +175,17 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
             break;
         case "lora":
             const menuLoras: MutableRef<any> = useRef(null);
-            const handleOnChangesLoras = (event: any) => {
-                state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask();
-            }
+            if (!valueExistInMenu(state.loras.value))
+                valid = false;
+
             useEffect(() => {
-                menuLoras.current?.addEventListener("change", handleOnChangesLoras);
+                menuLoras.current?.addEventListener("change", handleOnChangesMenuCombo);
                 return () => {
-                    menuLoras.current?.removeEventListener("change", handleOnChangesLoras);
+                    menuLoras.current?.removeEventListener("change", handleOnChangesMenuCombo);
                 };
             },)
             comp = (<sp-picker
+                invalid={valid ? null : true}
                 style={{width: "100%"}}>
                 <sp-menu slot="options" ref={menuLoras}>
                     {state.loras.value.map(lora =>
@@ -214,20 +202,50 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
             break;
         case "controlNet":
             const menuControlNet: MutableRef<any> = useRef(null);
-            const handleOnChangesControlNet = (event: any) => {
-                state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask();
-            }
+            if (!valueExistInMenu(state.controlNetModels.value))
+                valid = false;
+
             useEffect(() => {
-                menuControlNet.current?.addEventListener("change", handleOnChangesControlNet);
+                menuControlNet.current?.addEventListener("change", handleOnChangesMenuCombo);
                 return () => {
-                    menuControlNet.current?.removeEventListener("change", handleOnChangesControlNet);
+                    menuControlNet.current?.removeEventListener("change", handleOnChangesMenuCombo);
                 };
             },)
             comp = (<sp-picker
+                invalid={valid ? null : true}
                 style={{width: "100%"}}>
                 <sp-menu slot="options" ref={menuControlNet}>
                     {state.controlNetModels.value.map(model =>
+                        <sp-menu-item
+                            value={model}
+                            selected={state.taskVariablesFlat.value[props.name] && model === state.taskVariablesFlat.value[props.name] ?
+                                true : null}>
+                            {model}
+                        </sp-menu-item>
+                    )}
+                </sp-menu>
+                <sp-label slot="label">{props.label}</sp-label>
+            </sp-picker>)
+            break;
+        case "combo":
+            const menuCombo: MutableRef<any> = useRef(null);
+            let comboOptions: Array<string> = [];
+            if (props.variable.hasOwnProperty("options"))
+                comboOptions = props.variable["options"]
+            if (!valueExistInMenu(comboOptions))
+                valid = false;
+
+            useEffect(() => {
+                menuCombo.current?.addEventListener("change", handleOnChangesMenuCombo);
+                return () => {
+                    menuCombo.current?.removeEventListener("change", handleOnChangesMenuCombo);
+                };
+            })
+            comp = (<sp-picker
+                invalid={valid ? null : true}
+                style={{width: "100%"}}>
+                <sp-menu slot="options" ref={menuCombo}>
+                    {comboOptions.map(model =>
                         <sp-menu-item
                             value={model}
                             selected={state.taskVariablesFlat.value[props.name] && model === state.taskVariablesFlat.value[props.name] ?
