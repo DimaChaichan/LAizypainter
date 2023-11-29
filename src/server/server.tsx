@@ -5,7 +5,6 @@ import {createFileInDataFolder, findValAndReplace, map, MD5, randomSeed} from ".
 /**
  * Websocket server to communicate with ComfyUI Server (https://github.com/comfyanonymous/ComfyUI)
  * TODO: Create a Abstract Server Connected class for handle different server like ComfUI, Fooocus, A1111
- * TODO: create methode setStatus, setTaskStatus
  */
 export class Server {
     url: string | undefined;
@@ -23,7 +22,10 @@ export class Server {
     taskStatus: ETaskStatus = ETaskStatus.stop;
     loopStatus: ELoopStatus = ELoopStatus.stop;
 
-    handler: Array<{ type: EServerEventTypes, callback: (data: any) => void }> = [];
+    handler: Array<{
+        type: EServerEventTypes,
+        callback: (data: any) => void
+    }> = [];
 
     imageName = 'upload';
     imageHash = "";
@@ -36,8 +38,22 @@ export class Server {
     }
 
     isConnected() {
-        // TODO: change to readyState
         return this.status === EServerStatus.connected;
+    }
+
+    setStatus(status: EServerStatus) {
+        this.status = status;
+        this.emitEvent(EServerEventTypes.changeStatus, status)
+    }
+
+    setTaskStatus(status: ETaskStatus) {
+        this.taskStatus = status;
+        this.emitEvent(EServerEventTypes.changeTaskStatus, status)
+    }
+
+    setLoopStatus(status: ELoopStatus) {
+        this.loopStatus = status;
+        this.emitEvent(EServerEventTypes.changeLoopStatus, status)
     }
 
     connect(url: string) {
@@ -66,8 +82,7 @@ export class Server {
         self.socket = new WebSocket(wsUrl);
 
         self.socket.onopen = function () {
-            self.status = EServerStatus.connected;
-            self.emitEvent(EServerEventTypes.changeStatus, EServerStatus.connected)
+            self.setStatus(EServerStatus.connected)
 
             self.getModels().catch(err => {
                 console.error(`[Error] getModels ${err}`)
@@ -114,8 +129,7 @@ export class Server {
                                 data.data.status.exec_info.hasOwnProperty('queue_remaining') &&
                                 data.data.status.exec_info.queue_remaining === 0) {
 
-                                self.taskStatus = ETaskStatus.done;
-                                self.emitEvent(EServerEventTypes.changeTaskStatus, ETaskStatus.done)
+                                self.setTaskStatus(ETaskStatus.done)
 
                                 self.getFinishedImage()
                                     .then(() => {
@@ -140,8 +154,7 @@ export class Server {
                         case "executing":
                             self.executingNodeId = data.data.node;
                             if (self.executingNodeId && self.taskStatus !== ETaskStatus.stopping) {
-                                self.taskStatus = ETaskStatus.run;
-                                self.emitEvent(EServerEventTypes.changeTaskStatus, ETaskStatus.run)
+                                self.setTaskStatus(ETaskStatus.run)
                             }
                             break;
                         case "executed":
@@ -155,8 +168,7 @@ export class Server {
                         case "execution_cached":
                             if (self.taskStatus === ETaskStatus.pending) {
                                 self.emitEvent(EServerEventTypes.changeTaskProgress, 0)
-                                self.taskStatus = ETaskStatus.run;
-                                self.emitEvent(EServerEventTypes.changeTaskStatus, ETaskStatus.run)
+                                self.setTaskStatus(ETaskStatus.run)
                             }
                             break;
                     }
@@ -169,8 +181,7 @@ export class Server {
         self.socket.onclose = function () {
             console.error(`Socket Closed!`);
             self.stopLoop();
-            self.status = EServerStatus.disconnected;
-            self.emitEvent(EServerEventTypes.changeStatus, EServerStatus.disconnected)
+            self.setStatus(EServerStatus.disconnected)
         };
 
         self.socket.onerror = function () {
@@ -193,8 +204,7 @@ export class Server {
             return;
         }
         self.imageHash = "";
-        self.loopStatus = ELoopStatus.run;
-        self.emitEvent(EServerEventTypes.changeLoopStatus, self.loopStatus)
+        self.setLoopStatus(ELoopStatus.run)
         self.runTask()
     }
 
@@ -220,8 +230,7 @@ export class Server {
         const cancelUrl = self.taskStatus === ETaskStatus.pending ? "queue" : "interrupt";
         const body = self.taskStatus === ETaskStatus.pending ? {delete: [self.promptId]} : null;
 
-        self.taskStatus = ETaskStatus.stopping;
-        self.emitEvent(EServerEventTypes.changeTaskStatus, self.taskStatus)
+        self.setTaskStatus(ETaskStatus.stopping)
 
         self.fetch(`/${cancelUrl}`, {
             method: 'POST',
@@ -236,8 +245,7 @@ export class Server {
                 app.showAlert(`[ERROR] Prompt task: ${responseStop.statusText} Status: ${responseStop.status}`)
             } else {
                 if (skip && self.taskConfig?.mode == "loop") {
-                    self.taskStatus = ETaskStatus.stop;
-                    self.emitEvent(EServerEventTypes.changeTaskStatus, self.taskStatus)
+                    self.setTaskStatus(ETaskStatus.stop)
                     self.runTask();
                 } else {
                     self.clearTask();
@@ -330,15 +338,12 @@ export class Server {
             const hash = MD5(await pixelData.imageData.getData({}));
 
             if (hash === self.imageHash) {
-                self.taskStatus = ETaskStatus.done;
-                self.emitEvent(EServerEventTypes.changeTaskStatus, ETaskStatus.done)
+                self.setTaskStatus(ETaskStatus.done)
                 sameImage = true;
                 await pixelData.imageData.dispose();
             } else {
                 self.imageHash = hash;
-
-                self.taskStatus = ETaskStatus.pending;
-                self.emitEvent(EServerEventTypes.changeTaskStatus, ETaskStatus.pending)
+                self.setTaskStatus(ETaskStatus.pending)
 
                 let jpegData = await imaging.encodeImageData({"imageData": pixelData.imageData, "base64": false});
                 await pixelData.imageData.dispose();
@@ -397,10 +402,8 @@ export class Server {
     private clearTask() {
         this.timer = undefined;
         this.cleanImageHash();
-        this.taskStatus = ETaskStatus.stop;
-        this.emitEvent(EServerEventTypes.changeTaskStatus, this.taskStatus)
-        this.loopStatus = ELoopStatus.stop;
-        this.emitEvent(EServerEventTypes.changeLoopStatus, this.loopStatus)
+        this.setTaskStatus(ETaskStatus.stop)
+        this.setLoopStatus(ELoopStatus.stop)
     }
 
     private async getModels() {
