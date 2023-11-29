@@ -36,6 +36,9 @@ export function MainPanel() {
     const handleStopClick = () => {
         state.stopLoop();
     };
+    const handleSkipClick = () => {
+        state.skipLoop();
+    };
 
     const handleOpenTaskClick = () => {
         openFileDialog({
@@ -133,11 +136,20 @@ export function MainPanel() {
                                     <>
                                         <sp-button
                                             tabindex={1}
-                                            variant="primary"
+                                            variant="warning"
                                             onClick={handleStopClick}>
                                             Stop
                                         </sp-button>
-
+                                        {state.taskConfig.value.mode == "loop" ?
+                                            <sp-button
+                                                style={{
+                                                    marginLeft: "5px"
+                                                }}
+                                                variant="secondary"
+                                                onClick={handleSkipClick}>
+                                                Skip
+                                            </sp-button> :
+                                            null}
                                         {state.taskStatus.value === ETaskStatus.run ?
                                             <sp-progressbar
                                                 style={{

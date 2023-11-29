@@ -20,7 +20,10 @@ export function createAppState() {
 
     let task: any;
     const taskName = signal<string | undefined>(undefined);
-    const taskConfig = signal<ETaskConfig | undefined>(undefined);
+    const taskConfig = signal<ETaskConfig>({
+        mode: "loop",
+        uploadSize: 512
+    });
     const taskVariables = signal<any>(undefined);
     const taskVariablesFlat = signal<any>({});
     const taskStatus = signal<ETaskStatus>(ETaskStatus.stop);
@@ -50,7 +53,6 @@ export function createAppState() {
                 break;
         }
     }
-
 
     server.on(EServerEventTypes.changeStatus, (data) => {
         serverStatus.value = data;
@@ -105,7 +107,9 @@ export function createAppState() {
     const stopLoop = () => {
         server.stopLoop();
     }
-
+    const skipLoop = () => {
+        server.stopLoop(true);
+    }
     const rerunTask = (timer?: boolean) => {
         if (rerunTimer)
             clearTimeout(rerunTimer)
@@ -127,6 +131,7 @@ export function createAppState() {
             return
         taskVariablesFlat.value = JSON.parse(JSON.stringify(taskVariablesFlat.value)); // Deep Copy
     }
+    // TODO: Clean this Function, to much duplication, to noise
     const setTask = async (file: storage.File | undefined) => {
         if (file) {
             let data = JSON.parse((await file.read({format: storage.formats.utf8})).toString())
@@ -138,7 +143,7 @@ export function createAppState() {
                     uploadSize: data.config.uploadSize ? data.config.uploadSize : 512
                 }
             } else {
-                taskConfig.value = undefined;
+                taskConfig.value = {mode: "loop", uploadSize: 512};
             }
             if (data.hasOwnProperty('variables')) {
                 let variables: any = {};
@@ -169,7 +174,7 @@ export function createAppState() {
             taskVariablesFlat.value = undefined;
             server.task = task;
             taskName.value = undefined;
-            server.taskConfig = undefined;
+            server.taskConfig = {mode: "loop", uploadSize: 512};
             server.taskVariables = undefined;
             previewImageUrl.value = '';
         }
@@ -185,6 +190,7 @@ export function createAppState() {
 
         startLoop,
         stopLoop,
+        skipLoop,
 
         serverStatus,
         loopStatus,

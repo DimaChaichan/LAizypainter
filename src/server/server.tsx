@@ -5,13 +5,14 @@ import {createFileInDataFolder, findValAndReplace, map, MD5, randomSeed} from ".
 /**
  * Websocket server to communicate with ComfyUI Server (https://github.com/comfyanonymous/ComfyUI)
  * TODO: Create a Abstract Server Connected class for handle different server like ComfUI, Fooocus, A1111
+ * TODO: create methode setStatus, setTaskStatus
  */
 export class Server {
     url: string | undefined;
     socket: WebSocket | undefined;
 
     task: any;
-    taskConfig: ETaskConfig | undefined;
+    taskConfig: ETaskConfig = {mode: "loop", uploadSize: 512};
     taskVariables: any;
 
     clientId = "photoshopclient";
@@ -128,7 +129,7 @@ export class Server {
                                             self.runTask()
                                     })
                                     .catch(err => {
-                                        console.error(err)
+                                        console.error("[Error] getFinishedImage " + err)
                                         if (self.taskConfig?.mode === "single")
                                             self.stopLoop()
                                         else
@@ -205,7 +206,7 @@ export class Server {
         this.imageHash = '';
     }
 
-    stopLoop() {
+    stopLoop(skip?: boolean) {
         const self = this;
         if (self.taskStatus === ETaskStatus.stopping)
             return;
@@ -238,7 +239,13 @@ export class Server {
             if (responseStop.status !== 200) {
                 app.showAlert(`[ERROR] Prompt task: ${responseStop.statusText} Status: ${responseStop.status}`)
             } else {
-                self.clearTask();
+                if (skip && self.taskConfig?.mode == "loop") {
+                    self.taskStatus = ETaskStatus.stop;
+                    self.emitEvent(EServerEventTypes.changeTaskStatus, self.taskStatus)
+                    self.runTask();
+                } else {
+                    self.clearTask();
+                }
             }
         }).catch(err => {
             app.showAlert(`[Error] ${err}`)
