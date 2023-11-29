@@ -53,6 +53,15 @@ A task is a prompt (workflow) which is sent to the server. You can find an examp
       "value": "text, watermark",
       "label": "Negative Prompt:"
     },
+    "denoise": {
+      "type": "slider",
+      "value": 0.8,
+      "min": 0.01,
+      "max": 1,
+      "step": 0.01,
+      "mapMax": 1,
+      "label": "AI Freedom (Denoise):"
+    },
     "row1": {
       "type": "row",
       "seed": {
@@ -60,41 +69,76 @@ A task is a prompt (workflow) which is sent to the server. You can find an examp
         "value": "random",
         "label": "Seed:"
       },
-      "denoise": {
-        "type": "slider",
-        "value": 0.8,
-        "min": 0.01,
-        "max": 1,
-        "step": 0.01,
-        "mapMax": 1,
-        "label": "AI Freedom (Denoise):"
+      "steps": {
+        "type": "number",
+        "value": 20,
+        "label": "Steps:"
       }
     },
     "row2": {
       "type": "row",
-      "model": {
-        "type": "model",
-        "value": "sd_xl_base_1.0.safetensors",
-        "label": "Model:"
+      "cfg": {
+        "type": "number",
+        "value": 8,
+        "label": "CFG:"
       },
-      "lora": {
-        "type": "lora",
-        "value": "lcm_lora_weights.safetensors",
-        "label": "LCM Lora:"
+      "sampler": {
+        "type": "combo",
+        "value": "euler",
+        "options": [
+          "euler",
+          "euler_ancestral",
+          "heun",
+          "heunpp2",
+          "dpm_2",
+          "dpm_2_ancestral",
+          "lms",
+          "dpm_fast",
+          "dpm_adaptive",
+          "dpmpp_2s_ancestral",
+          "dpmpp_sde",
+          "dpmpp_sde_gpu",
+          "dpmpp_2m",
+          "dpmpp_2m_sde",
+          "dpmpp_2m_sde_gpu",
+          "dpmpp_3m_sde",
+          "dpmpp_3m_sde_gpu",
+          "ddpm",
+          "lcm"
+        ],
+        "label": "Sampler:"
+      },
+      "scheduler": {
+        "type": "combo",
+        "value": "normal",
+        "options": [
+          "normal",
+          "karras",
+          "exponential",
+          "sgm_uniform",
+          "simple",
+          "ddim_uniform"
+        ],
+        "label": "scheduler:"
       }
+    },
+    "model": {
+      "type": "model",
+      "value": "sd_xl_base_1.0.safetensors",
+      "label": "Model:"
     }
   },
   "prompt": {
     "3": {
       "inputs": {
         "seed": "#seed#",
-        "steps": 5,
-        "cfg": 1.3,
-        "sampler_name": "lcm",
-        "scheduler": "sgm_uniform",
+        "steps": "#steps#",
+        "cfg": "#cfg#",
+        "sampler_name": "#sampler#",
+        "scheduler": "#scheduler#",
         "denoise": "#denoise#",
         "model": [
-          "17",
+          "4",
           0
         ],
         "positive": [
@@ -106,17 +150,23 @@ A task is a prompt (workflow) which is sent to the server. You can find an examp
           0
         ],
         "latent_image": [
-          "20",
+          "13",
           0
         ]
       },
       "class_type": "KSampler"
     },
+    "4": {
+      "inputs": {
+        "ckpt_name": "#model#"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
     "6": {
       "inputs": {
         "text": "#positive#",
         "clip": [
-          "16",
+          "4",
           1
         ]
       },
@@ -126,7 +176,7 @@ A task is a prompt (workflow) which is sent to the server. You can find an examp
       "inputs": {
         "text": "#negative#",
         "clip": [
-          "16",
+          "4",
           1
         ]
       },
@@ -139,7 +189,7 @@ A task is a prompt (workflow) which is sent to the server. You can find an examp
           0
         ],
         "vae": [
-          "16",
+          "4",
           2
         ]
       },
@@ -155,47 +205,25 @@ A task is a prompt (workflow) which is sent to the server. You can find an examp
       },
       "class_type": "SaveImage"
     },
-    "16": {
+    "13": {
       "inputs": {
-        "ckpt_name": "#model#"
-      },
-      "class_type": "CheckpointLoaderSimple"
-    },
-    "17": {
-      "inputs": {
-        "lora_name": "#lora#",
-        "strength_model": 1,
-        "strength_clip": 1,
-        "model": [
-          "16",
+        "pixels": [
+          "15",
           0
         ],
-        "clip": [
-          "16",
-          1
+        "vae": [
+          "4",
+          2
         ]
       },
-      "class_type": "LoraLoader"
+      "class_type": "VAEEncode"
     },
-    "18": {
+    "15": {
       "inputs": {
         "image": "#image#",
         "choose file to upload": "image"
       },
       "class_type": "LoadImage"
-    },
-    "20": {
-      "inputs": {
-        "pixels": [
-          "18",
-          0
-        ],
-        "vae": [
-          "16",
-          2
-        ]
-      },
-      "class_type": "VAEEncode"
     }
   }
 }
@@ -263,6 +291,8 @@ The value **#image#** stands for the current image in Photoshop.
     - settings: value, min, max, step, label
 - seed
     - settings: value (random create a random value on load), label
+- combo
+  - settings: value, label, options
 - model
     - settings: value, label
 - lora
