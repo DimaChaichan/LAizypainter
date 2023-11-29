@@ -1,6 +1,7 @@
 import {storage} from "uxp";
 import CryptoJS from "crypto-js";
 import {action, core} from "photoshop";
+import Mexp from "math-expression-evaluator";
 
 /**
  * Open native File Dialog
@@ -87,17 +88,23 @@ export async function createFileInDataFolder(name: string) {
  * @param value
  * @param replace
  */
-export function findValAndReplace(object: any, value: any, replace: any) {
+export function findValAndReplace(object: any, value: any, replace: any): any {
     let found = false;
-    Object.keys(object).some(function (k) {
-        if (object[k] === value) {
-            found = true
-            object[k] = replace;
-            return true;
-        }
+    Object.keys(object).map(function (k) {
         if (object[k] && typeof object[k] === 'object') {
-            found = findValAndReplace(object[k], value, replace);
-            return found;
+            return findValAndReplace(object[k], value, replace);
+        }
+        if (typeof object[k] !== "string")
+            return;
+        if (object[k].includes(value)) {
+            found = true
+            object[k] = object[k].replace(value, replace);
+            if (typeof replace === "number") {
+                const mexp = new Mexp();
+                // @ts-ignore
+                object[k] = mexp.eval(object[k]);
+            }
+            return;
         }
     });
     return found;

@@ -22,6 +22,7 @@
     "vite-plugin-externals": "0.6.2",
     "vite-plugin-css-injected-by-js": "3.3.0",
     "crypto-js": "4.2.0",
-    "@types/crypto-js": "4.2.1"
+    "@types/crypto-js": "4.2.1",
+    "math-expression-evaluator": "2.0.4"
   }
 }

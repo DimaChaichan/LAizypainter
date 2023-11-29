@@ -307,8 +307,8 @@ export class Server {
 
         /**
          * This is a HUGE!!!! hack!!
-         * But with the PS 23.3 there is problem when Photoshop have open a Madal (like ColorPicker)
-         * I this moment you cant use executeAsModal!
+         * But with the PS 23.3 there is a problem when Photoshop have open a Madal (like ColorPicker)
+         * I this moment you can"t use executeAsModal!
          * However, with this code I check is a madal open or not.
          * core.isModal() works only for you plugin not for the Host.
          * TODO: Change this, when you find a better solution!
