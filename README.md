@@ -11,7 +11,8 @@ LAizypainter sends every change to the image to the server, so you can draw in p
 image. \
 It is recommended to use ICM Models to get a fast result.
 
-# ![Demo](./assets/demo.gif)
+# ![Demo 1](./assets/demo_1.gif)
+# ![Demo 2](./assets/demo_2.gif)
 
 ### Build
 
@@ -129,7 +130,7 @@ The value **#image#** stands for the current image in Photoshop.
 - row
     - is a container
 ```
-**Strings** can be concatenated e.g. `"#positive#, cartoon style"`
+**Strings** can be concatenated e.g. `"#positive#, cartoon style"`\
 **Numbers** can use expression e.g. `"#steps# + 10"`
 
 ### Debug Mode
