@@ -4,11 +4,6 @@
     "mode": "loop"
   },
   "variables": {
-    "aaaa": {
-      "type": "int",
-      "value": 10,
-      "label": "Positive Prompt:"
-    },
     "positive": {
       "type": "textarea",
       "value": "a cute cat",
@@ -59,7 +54,6 @@
     "3": {
       "inputs": {
         "seed": "#seed#",
-        "ssss": "#aaaa#",
         "steps": 5,
         "cfg": 1.3,
         "sampler_name": "lcm",
