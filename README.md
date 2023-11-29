@@ -4,7 +4,7 @@
 </p>
 
 LAizypainter is a Photoshop plugin with which you can send tasks directly to a Stable Diffusion server. \
-Currently only ComfyUI is not supported. Fooocus and A1111 are in planning.
+Currently only ComfyUI is supported. Fooocus and A1111 are in planning.
 
 LAizypainter sends every change to the image to the server, so you can draw in peace and see what the AI does with your image. \
 It is recommended to use ICM Models to get a fast result.
