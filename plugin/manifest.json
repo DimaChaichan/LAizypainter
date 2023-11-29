@@ -11,7 +11,6 @@
     }
   ],
   "requiredPermissions": {
-    "allowCodeGenerationFromStrings": true,
     "localFileSystem": "fullAccess",
     "network": {
       "domains": "all"
@@ -51,7 +50,7 @@
         {
           "width": 24,
           "height": 24,
-          "path": "icons/icon_D.png",
+          "path": "icons/dark.png",
           "scale": [
             1,
             2
@@ -67,7 +66,7 @@
         {
           "width": 24,
           "height": 24,
-          "path": "icons/icon_N.png",
+          "path": "icons/light.png",
           "scale": [
             1,
             2
@@ -87,7 +86,7 @@
     {
       "width": 48,
       "height": 48,
-      "path": "icons/icon_D.png",
+      "path": "icons/dark.png",
       "scale": [
         1,
         2
@@ -103,7 +102,7 @@
     {
       "width": 48,
       "height": 48,
-      "path": "icons/icon_N.png",
+      "path": "icons/light.png",
       "scale": [
         1,
         2

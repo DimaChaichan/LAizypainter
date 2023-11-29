@@ -1,10 +1,12 @@
-# LAizypainter
+# ![Logo](./plugin/icons/dark@1x.png) LAizypainter
+<p align="center">
+  <img src="./assets/logo_big.png" width="300"/>
+</p>
 
 LAizypainter is a Photoshop plugin with which you can send tasks directly to a Stable Diffusion server. \
 Currently only ComfyUI is not supported. Fooocus and A1111 are in planning.
 
-LAizypainter sends every change to the image to the server, so you can draw in peace and see what the AI does with your
-image. \
+LAizypainter sends every change to the image to the server, so you can draw in peace and see what the AI does with your image. \
 It is recommended to use ICM Models to get a fast result.
 
 # ![Demo](./assets/demo.gif)
@@ -15,10 +17,10 @@ You need NodeJs and NPM
 
 ```
 npm install
-npm build
+npm run build
 ```
 
-Import the plugin to Photoshop, the Manifest file is under `/dist`
+Import the plugin to UXP Developer Tool, the Manifest file is under `/dist`
 
 ## Server
 
