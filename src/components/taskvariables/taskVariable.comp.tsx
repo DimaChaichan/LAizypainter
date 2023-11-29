@@ -23,7 +23,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
         case "text":
             const handleTextInput = (event: any) => {
                 state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask(true);
+                state.rerunTask(3000);
             };
             comp = (<sp-textfield
                 value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
@@ -47,7 +47,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
 
                 state.taskVariablesFlat.value[props.name] = newVal;
                 state.reRenderTaskVariables();
-                state.rerunTask(true);
+                state.rerunTask(2500);
             };
             comp = (<sp-textfield className="theme-border"
                                   invalid={state.taskVariablesFlat.value[props.name] ? null : true}
@@ -71,7 +71,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
                 }
 
                 state.taskVariablesFlat.value[props.name] = newVal;
-                state.rerunTask(true);
+                state.rerunTask(2500);
             };
             comp = (<sp-textfield type="number" className="theme-border"
                                   invalid={state.taskVariablesFlat.value[props.name] ? null : true}
@@ -98,7 +98,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
 
                 state.taskVariablesFlat.value[props.name] = newVal;
                 state.reRenderTaskVariables();
-                state.rerunTask(true);
+                state.rerunTask(2000);
             };
             const handleSeedRandomClick = () => {
                 state.taskVariablesFlat.value[props.name] = randomSeed();
@@ -132,7 +132,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
         case "textarea":
             const handleTextAreaInput = (event: any) => {
                 state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask(true);
+                state.rerunTask(3000);
             };
             comp = (<sp-textarea className="theme-border"
                                  onInput={handleTextAreaInput}
@@ -146,7 +146,7 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
         case "slider":
             const handleSliderInput = (event: any) => {
                 state.taskVariablesFlat.value[props.name] = event.target.value;
-                state.rerunTask(true);
+                state.rerunTask(1000);
             };
             comp = (<sp-slider
                 onInput={handleSliderInput}

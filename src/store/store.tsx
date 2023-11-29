@@ -110,7 +110,7 @@ export function createAppState() {
     const skipLoop = () => {
         server.stopLoop(true);
     }
-    const rerunTask = (timer?: boolean) => {
+    const rerunTask = (timer?: number) => {
         if (rerunTimer)
             clearTimeout(rerunTimer)
 
@@ -118,7 +118,7 @@ export function createAppState() {
             rerunTimer = setTimeout(() => {
                 server.imageHash = "";
                 server.taskVariables = taskVariablesFlat.value;
-            }, 3000)
+            }, timer)
         } else {
             server.imageHash = "";
             server.taskVariables = taskVariablesFlat.value;
