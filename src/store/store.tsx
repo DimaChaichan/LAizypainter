@@ -32,10 +32,20 @@ export function createAppState() {
     const previewImageUrl = signal('')
     const previewImageBlob = signal<Blob | undefined>(undefined)
 
-    const models = signal<Array<string>>([])
-    const loras = signal<Array<string>>([])
-    const controlNetModels = signal<Array<string>>([])
-
+    const models = signal<EModelsConfig>({
+        checkpoints: [],
+        clip: [],
+        clipVision: [],
+        controlnet: [],
+        diffusers: [],
+        embeddings: [],
+        gligen: [],
+        hypernetworks: [],
+        loras: [],
+        styleModels: [],
+        upscaleModels: [],
+        vae: []
+    })
     const lastPrompt = signal<string>('')
     let rerunTimer: number;
     const flatTaskConfig = (name: string, variable: ITaskVariable | any, obj: any) => {
@@ -69,11 +79,8 @@ export function createAppState() {
     server.on(EServerEventTypes.getModels, (data) => {
         models.value = data;
     })
-    server.on(EServerEventTypes.getLoras, (data) => {
-        loras.value = data;
-    })
-    server.on(EServerEventTypes.getControlNetModels, (data) => {
-        controlNetModels.value = data;
+    server.on(EServerEventTypes.getEmbeddings, (data) => {
+        models.value.embeddings = data;
     })
     server.on(EServerEventTypes.sendPrompt, (data) => {
         lastPrompt.value = data;
@@ -207,8 +214,6 @@ export function createAppState() {
         lastPrompt,
 
         models,
-        loras,
-        controlNetModels,
 
         previewImageBlob,
         previewImageUrl
@@ -217,6 +222,21 @@ export function createAppState() {
 
 // #######################################################
 // Interface
+export interface EModelsConfig {
+    checkpoints: Array<string>
+    clip: Array<string>
+    clipVision: Array<string>
+    controlnet: Array<string>
+    diffusers: Array<string>
+    embeddings: Array<string>
+    gligen: Array<string>
+    hypernetworks: Array<string>
+    loras: Array<string>
+    styleModels: Array<string>
+    upscaleModels: Array<string>
+    vae: Array<string>
+}
+
 export interface ETaskConfig {
     mode: "single" | "loop"
     uploadSize: number

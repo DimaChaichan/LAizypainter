@@ -1,0 +1,51 @@
+{
+  "config": {
+    "uploadSize": 1024,
+    "mode": "single"
+  },
+  "variables": {
+    "model": {
+      "type": "upscaleModels",
+      "value": "realesrganX4plus_v1.pt",
+      "label": "Upscale Model:"
+    }
+  },
+  "prompt":{
+    "9": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "14",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "13": {
+      "inputs": {
+        "model_name": "#model#"
+      },
+      "class_type": "UpscaleModelLoader"
+    },
+    "14": {
+      "inputs": {
+        "upscale_model": [
+          "13",
+          0
+        ],
+        "image": [
+          "15",
+          0
+        ]
+      },
+      "class_type": "ImageUpscaleWithModel"
+    },
+    "15": {
+      "inputs": {
+        "image": "#image#",
+        "choose file to upload": "image"
+      },
+      "class_type": "LoadImage"
+    }
+  }
+}

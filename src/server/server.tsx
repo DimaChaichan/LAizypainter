@@ -1,4 +1,4 @@
-import {ELoopStatus, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
+import {ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
 import {app, core, imaging} from "photoshop";
 import {createFileInDataFolder, findValAndReplace, map, MD5, randomSeed} from "../utils.tsx";
 
@@ -73,12 +73,8 @@ export class Server {
                 console.error(`[Error] getModels ${err}`)
                 self.disconnect();
             })
-            self.getLoras().catch(err => {
-                console.error(`[Error] getLoras ${err}`)
-                self.disconnect();
-            })
-            self.getControlNetModels().catch(err => {
-                console.error(`[Error] getControlNetModels ${err}`)
+            self.getEmbeddings().catch(err => {
+                console.error(`[Error] getEmbeddings ${err}`)
                 self.disconnect();
             })
         };
@@ -409,7 +405,7 @@ export class Server {
 
     private async getModels() {
         const self = this;
-        const response = await self.fetch('/object_info/CheckpointLoaderSimple', {
+        const response = await self.fetch('/object_info', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
@@ -422,12 +418,26 @@ export class Server {
             throw `[ERROR] Get Models: ${response.statusText} Status: ${response.status}`;
         }
         const responseData = await response.json();
-        self.emitEvent(EServerEventTypes.getModels, responseData.CheckpointLoaderSimple.input.required.ckpt_name[0])
+        const models: EModelsConfig = {
+            checkpoints: responseData.CheckpointLoaderSimple.input.required.ckpt_name[0],
+            clip: responseData.CLIPLoader.input.required.clip_name[0],
+            clipVision: responseData.CLIPVisionLoader.input.required.clip_name[0],
+            controlnet: responseData.ControlNetLoader.input.required.control_net_name[0],
+            diffusers: responseData.DiffusersLoader.input.required.model_path[0],
+            embeddings: [],
+            gligen: responseData.GLIGENLoader.input.required.gligen_name[0],
+            hypernetworks: responseData.HypernetworkLoader.input.required.hypernetwork_name[0],
+            loras: responseData.LoraLoader.input.required.lora_name[0],
+            styleModels: responseData.StyleModelLoader.input.required.style_model_name[0],
+            upscaleModels: responseData.UpscaleModelLoader.input.required.model_name[0],
+            vae: responseData.VAELoader.input.required.vae_name[0]
+        }
+        self.emitEvent(EServerEventTypes.getModels, models)
     }
 
-    private async getLoras() {
+    private async getEmbeddings() {
         const self = this;
-        const response = await self.fetch('/object_info/LoraLoader', {
+        const response = await self.fetch('/embeddings', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
@@ -437,28 +447,10 @@ export class Server {
             return
         if (response.status !== 200) {
             self.stopLoop();
-            throw `[ERROR] Get Loras: ${response.statusText} Status: ${response.status}`;
+            throw `[ERROR] Get Embeddings: ${response.statusText} Status: ${response.status}`;
         }
         const responseData = await response.json();
-        self.emitEvent(EServerEventTypes.getLoras, responseData.LoraLoader.input.required.lora_name[0])
-    }
-
-    private async getControlNetModels() {
-        const self = this;
-        const response = await self.fetch('/object_info/ControlNetLoader', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-            }
-        })
-        if (!response)
-            return
-        if (response.status !== 200) {
-            self.stopLoop();
-            throw `[ERROR] Prompt task: ${response.statusText} Status: ${response.status}`;
-        }
-        const responseData = await response.json();
-        self.emitEvent(EServerEventTypes.getControlNetModels, responseData.ControlNetLoader.input.required.control_net_name[0])
+        self.emitEvent(EServerEventTypes.getEmbeddings, responseData)
     }
 
     private serializeImageData(obj: any) {
@@ -561,7 +553,6 @@ export enum EServerEventTypes {
     "message",
     "previewImage",
     "getModels",
-    "getLoras",
-    "getControlNetModels",
+    "getEmbeddings",
     "sendPrompt",
 }

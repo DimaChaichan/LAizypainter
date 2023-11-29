@@ -1,0 +1,178 @@
+{
+  "config": {
+    "uploadSize": 1024,
+    "mode": "loop"
+  },
+  "variables": {
+    "positive": {
+      "type": "textarea",
+      "value": "a cute cat",
+      "label": "Positive Prompt:"
+    },
+    "negative": {
+      "type": "text",
+      "value": "text, watermark",
+      "label": "Negative Prompt:"
+    },
+    "denoise": {
+      "type": "slider",
+      "value": 0.8,
+      "min": 0.01,
+      "max": 1,
+      "step": 0.01,
+      "mapMax": 1,
+      "label": "AI Freedom (Denoise):"
+    },
+    "row1": {
+      "type": "row",
+      "seed": {
+        "type": "seed",
+        "value": "random",
+        "label": "Seed:"
+      },
+      "steps": {
+        "type": "number",
+        "value": 20,
+        "label": "Steps:"
+      }
+    },
+    "row2": {
+      "type": "row",
+      "cfg": {
+        "type": "number",
+        "value": 8,
+        "label": "CFG:"
+      },
+      "sampler": {
+        "type": "combo",
+        "value": "euler",
+        "options": [
+          "euler",
+          "euler_ancestral",
+          "heun",
+          "heunpp2",
+          "dpm_2",
+          "dpm_2_ancestral",
+          "lms",
+          "dpm_fast",
+          "dpm_adaptive",
+          "dpmpp_2s_ancestral",
+          "dpmpp_sde",
+          "dpmpp_sde_gpu",
+          "dpmpp_2m",
+          "dpmpp_2m_sde",
+          "dpmpp_2m_sde_gpu",
+          "dpmpp_3m_sde",
+          "dpmpp_3m_sde_gpu",
+          "ddpm",
+          "lcm"
+        ],
+        "label": "Sampler:"
+      },
+      "scheduler": {
+        "type": "combo",
+        "value": "normal",
+        "options": [
+          "normal",
+          "karras",
+          "exponential",
+          "sgm_uniform",
+          "simple",
+          "ddim_uniform"
+        ],
+        "label": "scheduler:"
+      }
+    },
+    "model": {
+      "type": "model",
+      "value": "sd_xl_base_1.0.safetensors",
+      "label": "Model:"
+    }
+  },
+  "prompt": {
+    "3": {
+      "inputs": {
+        "seed": "#seed#",
+        "steps": "#steps#",
+        "cfg": "#cfg#",
+        "sampler_name": "#sampler#",
+        "scheduler": "#scheduler#",
+        "denoise": "#denoise#",
+        "model": [
+          "4",
+          0
+        ],
+        "positive": [
+          "6",
+          0
+        ],
+        "negative": [
+          "7",
+          0
+        ],
+        "latent_image": [
+          "24",
+          0
+        ]
+      },
+      "class_type": "KSampler"
+    },
+    "4": {
+      "inputs": {
+        "ckpt_name": "#model#"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
+    "6": {
+      "inputs": {
+        "text": "#positive#",
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "7": {
+      "inputs": {
+        "text": "#negative#",
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "8": {
+      "inputs": {
+        "samples": [
+          "3",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "class_type": "VAEDecode"
+    },
+    "9": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "8",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "24": {
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage"
+    }
+  }
+}

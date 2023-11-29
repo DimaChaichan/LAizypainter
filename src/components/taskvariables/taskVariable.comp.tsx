@@ -1,24 +1,20 @@
-import {useContext, useEffect, useRef} from "react";
-import {MutableRef} from "preact/hooks";
+import {useContext} from "react";
 import {AppState} from "../../main.tsx";
 import {randomSeed} from "../../utils.tsx";
+import {TaskVariableModels} from "./taskVariableModels.comp.tsx";
 
-export function TaskVariable(props: { variable: ITaskVariable | any, name: string, label: string }) {
+export function TaskVariable(props: {
+    variable: ITaskVariable | any,
+    name: string,
+    label: string
+}) {
     const state = useContext(AppState);
 
     let comp = null;
-    let valid = true;
     const serVariable = (value: any, rerun: boolean, timer?: number) => {
         state.taskVariablesFlat.value[props.name] = value;
         if (rerun)
             state.rerunTask(timer);
-    }
-    const valueExistInMenu = (menu: Array<string>) => {
-        if (!menu.some(model => model === state.taskVariablesFlat.value[props.name])) {
-            state.taskVariablesFlat.value[props.name] = undefined;
-            return false;
-        }
-        return true;
     }
 
     const handleCheckboxChange = (event: any) => {
@@ -27,10 +23,6 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
     const handleTextInput = (event: any) => {
         serVariable(event.target.value, true, 3000);
     };
-    const handleOnChangesMenuCombo = (event: any) => {
-        event.target.parentElement.removeAttribute('invalid')
-        serVariable(event.target.value, true);
-    }
     const handleNumberInput = (event: any) => {
         let newVal = event.target.value;
         newVal = parseFloat(newVal.replace(",", "."))
@@ -147,115 +139,48 @@ export function TaskVariable(props: { variable: ITaskVariable | any, name: strin
             </sp-slider>)
             break;
         case "model":
-            const menuModels: MutableRef<any> = useRef(null);
-            if (!valueExistInMenu(state.models.value))
-                valid = false;
-
-            useEffect(() => {
-                menuModels.current?.addEventListener("change", handleOnChangesMenuCombo);
-                return () => {
-                    menuModels.current?.removeEventListener("change", handleOnChangesMenuCombo);
-                };
-            },)
-            comp = (<sp-picker
-                invalid={valid ? null : true}
-                style={{width: "100%"}}>
-                <sp-menu slot="options" ref={menuModels}>
-                    {state.models.value.map(model =>
-                        <sp-menu-item
-                            value={model}
-                            selected={state.taskVariablesFlat.value[props.name] && model === state.taskVariablesFlat.value[props.name] ?
-                                true : null}>
-                            {model}
-                        </sp-menu-item>
-                    )}
-                </sp-menu>
-                <sp-label slot="label">{props.label}</sp-label>
-            </sp-picker>)
+            comp = (<TaskVariableModels models={state.models.value.checkpoints} label={props.label} name={props.name}/>)
             break;
-        case "lora":
-            const menuLoras: MutableRef<any> = useRef(null);
-            if (!valueExistInMenu(state.loras.value))
-                valid = false;
-
-            useEffect(() => {
-                menuLoras.current?.addEventListener("change", handleOnChangesMenuCombo);
-                return () => {
-                    menuLoras.current?.removeEventListener("change", handleOnChangesMenuCombo);
-                };
-            },)
-            comp = (<sp-picker
-                invalid={valid ? null : true}
-                style={{width: "100%"}}>
-                <sp-menu slot="options" ref={menuLoras}>
-                    {state.loras.value.map(lora =>
-                        <sp-menu-item
-                            value={lora}
-                            selected={state.taskVariablesFlat.value[props.name] && lora === state.taskVariablesFlat.value[props.name] ?
-                                true : null}>
-                            {lora}
-                        </sp-menu-item>
-                    )}
-                </sp-menu>
-                <sp-label slot="label">{props.label}</sp-label>
-            </sp-picker>)
+        case "clip":
+            comp = (<TaskVariableModels models={state.models.value.clip} label={props.label} name={props.name}/>)
+            break;
+        case "clipVision":
+            comp = (<TaskVariableModels models={state.models.value.clipVision} label={props.label} name={props.name}/>)
             break;
         case "controlNet":
-            const menuControlNet: MutableRef<any> = useRef(null);
-            if (!valueExistInMenu(state.controlNetModels.value))
-                valid = false;
-
-            useEffect(() => {
-                menuControlNet.current?.addEventListener("change", handleOnChangesMenuCombo);
-                return () => {
-                    menuControlNet.current?.removeEventListener("change", handleOnChangesMenuCombo);
-                };
-            },)
-            comp = (<sp-picker
-                invalid={valid ? null : true}
-                style={{width: "100%"}}>
-                <sp-menu slot="options" ref={menuControlNet}>
-                    {state.controlNetModels.value.map(model =>
-                        <sp-menu-item
-                            value={model}
-                            selected={state.taskVariablesFlat.value[props.name] && model === state.taskVariablesFlat.value[props.name] ?
-                                true : null}>
-                            {model}
-                        </sp-menu-item>
-                    )}
-                </sp-menu>
-                <sp-label slot="label">{props.label}</sp-label>
-            </sp-picker>)
+            comp = (<TaskVariableModels models={state.models.value.controlnet} label={props.label} name={props.name}/>)
+            break;
+        case "diffusers":
+            comp = (<TaskVariableModels models={state.models.value.diffusers} label={props.label} name={props.name}/>)
+            break;
+        case "embeddings":
+            comp = (<TaskVariableModels models={state.models.value.embeddings} label={props.label} name={props.name}/>)
+            break;
+        case "gligen":
+            comp = (<TaskVariableModels models={state.models.value.gligen} label={props.label} name={props.name}/>)
+            break;
+        case "hypernetworks":
+            comp = (
+                <TaskVariableModels models={state.models.value.hypernetworks} label={props.label} name={props.name}/>)
+            break;
+        case "lora":
+            comp = (<TaskVariableModels models={state.models.value.loras} label={props.label} name={props.name}/>)
+            break;
+        case "styleModels":
+            comp = (<TaskVariableModels models={state.models.value.styleModels} label={props.label} name={props.name}/>)
+            break;
+        case "upscaleModels":
+            comp = (
+                <TaskVariableModels models={state.models.value.upscaleModels} label={props.label} name={props.name}/>)
+            break;
+        case "vae":
+            comp = (<TaskVariableModels models={state.models.value.vae} label={props.label} name={props.name}/>)
             break;
         case "combo":
-            const menuCombo: MutableRef<any> = useRef(null);
             let comboOptions: Array<string> = [];
             if (props.variable.hasOwnProperty("options"))
                 comboOptions = props.variable["options"]
-            if (!valueExistInMenu(comboOptions))
-                valid = false;
-
-            useEffect(() => {
-                menuCombo.current?.addEventListener("change", handleOnChangesMenuCombo);
-                return () => {
-                    menuCombo.current?.removeEventListener("change", handleOnChangesMenuCombo);
-                };
-            })
-            comp = (<sp-picker
-                invalid={valid ? null : true}
-                style={{width: "100%"}}>
-                <sp-menu slot="options" ref={menuCombo}>
-                    {comboOptions.map(model =>
-                        <sp-menu-item
-                            value={model}
-                            selected={state.taskVariablesFlat.value[props.name] && model === state.taskVariablesFlat.value[props.name] ?
-                                true : null}>
-                            {model}
-                        </sp-menu-item>
-                    )}
-                </sp-menu>
-                <sp-label slot="label">{props.label}</sp-label>
-            </sp-picker>)
+            comp = (<TaskVariableModels models={comboOptions} label={props.label} name={props.name}/>)
             break;
         case "row":
             comp = (

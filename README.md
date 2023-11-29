@@ -1,4 +1,5 @@
 # ![Logo](./plugin/icons/dark@1x.png) LAizypainter
+
 <p align="center">
   <img src="./assets/logo_big.png" width="300"/>
 </p>
@@ -6,7 +7,8 @@
 LAizypainter is a Photoshop plugin with which you can send tasks directly to a Stable Diffusion server. \
 Currently only ComfyUI is supported. Fooocus and A1111 are in planning.
 
-LAizypainter sends every change to the image to the server, so you can draw in peace and see what the AI does with your image. \
+LAizypainter sends every change to the image to the server, so you can draw in peace and see what the AI does with your
+image. \
 It is recommended to use ICM Models to get a fast result.
 
 # ![Demo](./assets/demo.gif)
@@ -83,7 +85,7 @@ This makes it possible to build special tasks.
 The value **#image#** stands for the current image in Photoshop.
 
 ### Variables Types
-
+```
 - bool
     - settings: value, label
 - text
@@ -99,16 +101,34 @@ The value **#image#** stands for the current image in Photoshop.
 - seed
     - settings: value (random create a random value on load), label
 - combo
-  - settings: value, label, options
+    - settings: value, label, options
 - model
     - settings: value, label
-- lora
+- clip
     - settings: value, label
-- controlNet (models)
+- clipVision
+    - settings: value, label
+- controlnet
+    - settings: value, label
+- diffusers
+    - settings: value, label
+- embeddings
+    - settings: value, label
+- gligen
+    - settings: value, label
+- hypernetworks
+    - settings: value, label
+- loras
+    - settings: value, label
+- styleModels
+    - settings: value, label
+- upscaleModels
+    - settings: value, label
+- vae
     - settings: value, label
 - row
     - is a container
-
+```
 **Strings** can be concatenated e.g. `"#positive#, cartoon style"`
 **Numbers** can use expression e.g. `"#steps# + 10"`
 
