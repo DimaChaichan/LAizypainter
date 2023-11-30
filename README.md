@@ -14,6 +14,11 @@ It is recommended to use ICM Models to get a fast result.
 # ![Demo 1](./assets/demo_1.gif)
 # ![Demo 2](./assets/demo_2.gif)
 
+### Install
+Download the current version `.ccx` under [Releases](./releases). \
+Open the file and install the plugin over Adobe Creative Cloud. \
+examples of tasks can also be found in the release. Download the Task.zip and unzip it.
+
 ### Build
 
 You need NodeJs and NPM
