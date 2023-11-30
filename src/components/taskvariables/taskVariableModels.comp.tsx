@@ -13,7 +13,7 @@ export function TaskVariableModels(props: { models: Array<string>, name: string,
     }
     const valueExistInMenu = () => {
         if (!props.models.some(model => model === state.taskVariablesFlat.value[props.name])) {
-            // state.taskVariablesFlat.value[props.name] = undefined;
+            state.taskVariablesFlat.value[props.name] = undefined;
             return false;
         }
         return true;

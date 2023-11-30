@@ -13,6 +13,7 @@ export function TaskVariable(props: {
     let comp = null;
     const serVariable = (value: any, rerun: boolean, timer?: number) => {
         state.taskVariablesFlat.value[props.name] = value;
+        state.saveTaskVariablesLocal();
         if (rerun)
             state.rerunTask(timer);
     }

@@ -150,6 +150,11 @@ export function createAppState() {
             return
         taskVariablesFlat.value = JSON.parse(JSON.stringify(taskVariablesFlat.value)); // Deep Copy
     }
+    const saveTaskVariablesLocal = () => {
+        if (!taskVariables.value)
+            return
+        localStorage.setItem(`${taskVariables.value.name}_task`, JSON.stringify(taskVariablesFlat.value))
+    }
     // TODO: Clean this Function, to much duplication, to noise
     const setTask = async (file: storage.File | undefined) => {
         if (file) {
@@ -174,7 +179,18 @@ export function createAppState() {
                     app.showAlert(e)
                     return
                 }
+                data.variables.name = file.name;
                 taskVariables.value = data.variables;
+
+                const localVariableString = localStorage.getItem(`${taskVariables.value.name}_task`)
+                if (localVariableString) {
+                    const localVariable = JSON.parse(localVariableString);
+                    Object.keys(localVariable).map(key => {
+                        if (variables.hasOwnProperty(key) && variables[key] !== "random")
+                            variables[key] = localVariable[key]
+                    })
+                }
+
                 taskVariablesFlat.value = variables
             } else {
                 taskVariables.value = undefined;
@@ -220,6 +236,7 @@ export function createAppState() {
         taskConfig,
         taskVariables,
         taskVariablesFlat,
+        saveTaskVariablesLocal,
         reRenderTaskVariables,
         rerunTask,
         setTask,

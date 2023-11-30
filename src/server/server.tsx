@@ -289,12 +289,6 @@ export class Server {
         const self = this;
         let sameImage = false;
 
-        // console.log("1", self.taskStatus === ETaskStatus.stopping)
-        // console.log("2", self.taskStatus === ETaskStatus.run)
-        // console.log("3", !app.activeDocument)
-        // console.log("4", core.isModal())
-        console.log("5", !self.validatePromptTask())
-
         if (self.taskStatus === ETaskStatus.stopping) {
             return;
         }
