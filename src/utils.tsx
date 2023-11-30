@@ -2,6 +2,7 @@ import {storage} from "uxp";
 import CryptoJS from "crypto-js";
 import {action, core} from "photoshop";
 import Mexp from "math-expression-evaluator";
+import {EImageComfy} from "./store/store.tsx";
 
 /**
  * Open native File Dialog
@@ -143,6 +144,39 @@ export function MD5(data: Uint8Array | Uint16Array | Float32Array) {
     return CryptoJS.MD5(wordArray).toString()
 }
 
+/**
+ * Serialize Image Comfy Data
+ * @param image
+ */
+export function serializeImageComfyData(image: EImageComfy | undefined) {
+    if (!image)
+        return "";
+    let str = [];
+    for (let p in image)
+        if (image.hasOwnProperty(p)) {
+            // @ts-ignore
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(image[p]));
+        }
+    return str.join("&");
+}
+
+/**
+ * Place Comfy Output image as new Layer
+ * @param image
+ * @param name
+ * @param state
+ */
+export async function placeComfyImageAsLayer(image: EImageComfy | undefined, name: string, state: any) {
+    if (!image)
+        return
+    const blob = await state.getHistoryImage(image)
+    if (blob) {
+        const arrayBuffer = new Uint8Array(await blob?.arrayBuffer());
+        const tmpFile = await createFileInDataFolder(name + '.png')
+        await tmpFile.write(arrayBuffer)
+        await placeFileAsLayer(tmpFile);
+    }
+}
 
 // #######################################################
 // Interface

@@ -2,11 +2,10 @@ import {useContext} from "react";
 import {AppState} from "../../main.tsx";
 import CollapseContainer from "../collapseContainer/collapseContainer.comp.tsx";
 import {createFileInDataFolder, placeFileAsLayer} from "../../utils.tsx";
-import {createRef} from "preact";
+import {Image} from "./image.comp.tsx";
 
 export function ImagePreview() {
     const state = useContext(AppState);
-    const previewImage = createRef();
     const handleImageAsLayerClick = async () => {
         if (!state.previewImageBlob.value)
             return
@@ -26,41 +25,31 @@ export function ImagePreview() {
                         expand={true}
                         label={"Image"}
                         selected={false}>
-                        <>
-                            {state.previewImageUrl.value && state.previewImageUrl.value !== "" ?
-                                <div>
-                                    {state.previewImageBlob.value ?
-                                        <div style={{
-                                            width: "100%",
-                                            padding: "0 5px"
-                                        }}>
-                                            <sp-action-button
-                                                style={{
-                                                    width: "100%"
-                                                }}
-                                                onClick={handleImageAsLayerClick}>Image as Layer
-                                            </sp-action-button>
-                                        </div>
-                                        :
-                                        null
-                                    }
-                                    <img ref={previewImage}
-                                         style={{width: '100%', padding: '5px'}}
-                                         src={state.previewImageUrl.value}
-                                         alt={'Preview'}
-                                    ></img>
-                                </div>
-                                :
-                                <div style={{
-                                    width: "100%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center"
-                                }}>
-                                    <sp-body size="XS">No Preview available!</sp-body>
-                                </div>
-                            }
-                        </>
+                        <div style={{
+                            height: "350px",
+                            overflow: "hidden"
+                        }}>
+                            <div style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                height: "100%"
+                            }}>
+                                {state.previewImageUrl.value && state.previewImageUrl.value !== "" ?
+                                    <Image url={state.previewImageUrl.value}
+                                           onPlaceToLayerCLick={handleImageAsLayerClick}/>
+                                    :
+                                    <div style={{
+                                        width: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }}>
+                                        <sp-body size="XS">No Preview available!</sp-body>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </CollapseContainer>
                 </>
                 :

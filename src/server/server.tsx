@@ -1,6 +1,6 @@
-import {ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
+import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
 import {app, core, imaging} from "photoshop";
-import {createFileInDataFolder, findValAndReplace, map, MD5, randomSeed} from "../utils.tsx";
+import {createFileInDataFolder, findValAndReplace, map, MD5, randomSeed, serializeImageComfyData} from "../utils.tsx";
 
 /**
  * Websocket server to communicate with ComfyUI Server (https://github.com/comfyanonymous/ComfyUI)
@@ -90,6 +90,10 @@ export class Server {
             })
             self.getEmbeddings().catch(err => {
                 console.error(`[Error] getEmbeddings ${err}`)
+                self.disconnect();
+            })
+            self.getHistory().catch(err => {
+                console.error(`[Error] getHistory ${err}`)
                 self.disconnect();
             })
         };
@@ -456,14 +460,25 @@ export class Server {
         self.emitEvent(EServerEventTypes.getEmbeddings, responseData)
     }
 
-    private serializeImageData(obj: any) {
-        let str = [];
-        for (let p in obj)
-            if (obj.hasOwnProperty(p)) {
-                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+    private async getHistory() {
+        const self = this;
+        const response = await self.fetch('/history', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
             }
-        return str.join("&");
+        })
+        if (!response)
+            return
+        if (response.status !== 200) {
+            self.stopLoop();
+            throw `[ERROR] Get History: ${response.statusText} Status: ${response.status}`;
+        }
+
+        const responseData = await response.json();
+        self.emitEvent(EServerEventTypes.getHistory, Object.values(responseData).reverse())
     }
+
 
     private async getFinishedImage() {
         const self = this;
@@ -481,7 +496,6 @@ export class Server {
         if (!outputs) {
             return
         }
-
         let previewNode = this.executingNodeId;
         if (!previewNode)
             previewNode = Object.keys(outputs)[0];
@@ -492,8 +506,23 @@ export class Server {
         if (!images)
             return
 
-        const image = images.pop();
-        const url_values = self.serializeImageData(image)
+        const image = images[images.length - 1];
+        const url_values = serializeImageComfyData(image)
+        const responseImage = await self.fetch(`/view?${url_values}`)
+        if (!responseImage)
+            return
+        if (responseImage.status !== 200) {
+            throw `Response view Status: ${responseImage.status}`;
+        }
+        self.emitEvent(EServerEventTypes.addHistory, data[self.promptId])
+        const imageData = await responseImage.arrayBuffer();
+        const imageBlob = new Blob([imageData], {type: "image/png"});
+        self.emitEvent(EServerEventTypes.previewImage, imageBlob)
+    }
+
+    async getHistoryImage(image: EImageComfy) {
+        const self = this;
+        const url_values = serializeImageComfyData(image)
         const responseImage = await self.fetch(`/view?${url_values}`)
         if (!responseImage)
             return
@@ -501,8 +530,7 @@ export class Server {
             throw `Response view Status: ${responseImage.status}`;
         }
         const imageData = await responseImage.arrayBuffer();
-        const imageBlob = new Blob([imageData], {type: "image/png"});
-        self.emitEvent(EServerEventTypes.previewImage, imageBlob)
+        return new Blob([imageData], {type: "image/png"});
     }
 
     private getImageName() {
@@ -548,6 +576,7 @@ export class Server {
 
 
 export enum EServerEventTypes {
+    "addHistory",
     "changeStatus",
     "changeTaskStatus",
     "changeTaskProgress",
@@ -557,5 +586,6 @@ export enum EServerEventTypes {
     "previewImage",
     "getModels",
     "getEmbeddings",
+    "getHistory",
     "sendPrompt",
 }

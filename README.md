@@ -138,9 +138,3 @@ The value **#image#** stands for the current image in Photoshop.
 In debug mode you can view the last prompt sent. \
 To activate the debug mode open the panel menu \
 ![debugmode.png](assets%2Fdebugmode.png)
-
-### Known Issues
-
-On every "redraw" the scrollbar jumps to the Top. Current there is no way to fix this, UXP not supported Scroll
-Events. \
-Please make the window size bigger to avoid this. 

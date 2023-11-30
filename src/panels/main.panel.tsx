@@ -12,6 +12,7 @@ import {app} from "photoshop";
 import {TaskvariablesContainer} from "../components/taskvariables/taskvariablesContainer.comp.tsx";
 import {ImagePreview} from "../components/imagePreview/imagePreview.comp.tsx";
 import {Debug} from "../components/debug/debug.comp.tsx";
+import {History} from "../components/history/history.comp.tsx";
 
 export function MainPanel() {
     const state = useContext(AppState);
@@ -64,8 +65,7 @@ export function MainPanel() {
                         width: "100%",
                         padding: "5px"
                     }}>
-                    <sp-textfield className="theme-border"
-                                  value={state.serverUrl.value}
+                    <sp-textfield value={state.serverUrl.value}
                                   style={{width: "100%"}}
                                   ref={serverUrl}>
                         <sp-label isrequired="true" slot="label"
@@ -199,7 +199,7 @@ export function MainPanel() {
                         ref={mainContainer}
                         style={{
                             width: "100%",
-                            height: "100%",
+                            height: "calc(100% - 100px)",
                             overflow: "auto"
                         }}>
                         {state.taskName.value ?
@@ -207,6 +207,7 @@ export function MainPanel() {
                             : null
                         }
                         <ImagePreview/>
+                        <History/>
                         {debug.value ?
                             <Debug/>
                             : null}

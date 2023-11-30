@@ -64,8 +64,7 @@ export function TaskVariable(props: {
             </sp-textfield>)
             break;
         case "textarea":
-            comp = (<sp-textarea className="theme-border"
-                                 onInput={handleTextInput}
+            comp = (<sp-textarea onInput={handleTextInput}
                                  value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                                  style={{width: "100%"}}>
                 <sp-label slot="label"
@@ -74,8 +73,7 @@ export function TaskVariable(props: {
             </sp-textarea>)
             break;
         case "int":
-            comp = (<sp-textfield className="theme-border"
-                                  invalid={state.taskVariablesFlat.value[props.name] ? null : true}
+            comp = (<sp-textfield invalid={state.taskVariablesFlat.value[props.name] ? null : true}
                                   value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                                   style={{width: "100%"}}
                                   onInput={handleNumberInput}>
@@ -85,7 +83,7 @@ export function TaskVariable(props: {
             </sp-textfield>)
             break;
         case "number":
-            comp = (<sp-textfield type="number" className="theme-border"
+            comp = (<sp-textfield type="number"
                                   invalid={state.taskVariablesFlat.value[props.name] ? null : true}
                                   value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                                   onInput={handleNumberInput}
@@ -105,8 +103,7 @@ export function TaskVariable(props: {
             };
             comp = (
                 <div style={{width: "100%", display: "flex"}}>
-                    <sp-textfield className="theme-border"
-                                  invalid={state.taskVariablesFlat.value[props.name] ? null : true}
+                    <sp-textfield invalid={state.taskVariablesFlat.value[props.name] ? null : true}
                                   value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                                   style={{width: "100%"}}
                                   onInput={handleNumberInput}>

@@ -29,6 +29,11 @@ export function createAppState() {
     const taskStatus = signal<ETaskStatus>(ETaskStatus.stop);
     const taskProgress = signal(0);
 
+    const history = signal<any>([])
+    const getHistoryImage = async (image: EImageComfy) => {
+        return server.getHistoryImage(image)
+    }
+
     const previewImageUrl = signal('')
     const previewImageBlob = signal<Blob | undefined>(undefined)
 
@@ -85,6 +90,12 @@ export function createAppState() {
     server.on(EServerEventTypes.sendPrompt, (data) => {
         lastPrompt.value = data;
     })
+    server.on(EServerEventTypes.addHistory, (data) => {
+        history.value = [data, ...history.value]
+    })
+    server.on(EServerEventTypes.getHistory, (data) => {
+        history.value = data;
+    })
     server.on(EServerEventTypes.error, () => {
         app.showAlert(`Can't connect to the Server: ${serverUrl.value}`)
     })
@@ -106,6 +117,7 @@ export function createAppState() {
         setTask(undefined);
         server.disconnect()
     }
+
     const startLoop = () => {
         if (serverStatus.value == EServerStatus.connected) {
             server.startLoop();
@@ -215,6 +227,9 @@ export function createAppState() {
 
         models,
 
+        history,
+        getHistoryImage,
+
         previewImageBlob,
         previewImageUrl
     }
@@ -235,6 +250,12 @@ export interface EModelsConfig {
     styleModels: Array<string>
     upscaleModels: Array<string>
     vae: Array<string>
+}
+
+export interface EImageComfy {
+    filename: string,
+    subfolder: string,
+    type: string
 }
 
 export interface ETaskConfig {
