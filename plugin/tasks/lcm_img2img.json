@@ -23,6 +23,7 @@
       "label": "AI Freedom (Denoise):"
     },
     "row1": {
+      "advanced": true,
       "type": "row",
       "seed": {
         "type": "seed",
@@ -36,6 +37,7 @@
       }
     },
     "row2": {
+      "advanced": true,
       "type": "row",
       "cfg": {
         "type": "number",
@@ -83,6 +85,7 @@
       }
     },
     "row3": {
+      "advanced": true,
       "type": "row",
       "model": {
         "type": "model",

@@ -25,6 +25,7 @@
     },
     "row1": {
       "type": "row",
+      "advanced": true,
       "seed": {
         "type": "seed",
         "value": "random",
@@ -38,6 +39,7 @@
     },
     "row2": {
       "type": "row",
+      "advanced": true,
       "cfg": {
         "type": "number",
         "value": 8,
@@ -84,6 +86,7 @@
       }
     },
     "model": {
+      "advanced": true,
       "type": "model",
       "value": "sd_xl_base_1.0.safetensors",
       "label": "Model:"

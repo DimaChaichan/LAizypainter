@@ -57,7 +57,7 @@ export function createAppState() {
         switch (variable.type) {
             case "row":
                 Object.keys(variable).map(key => {
-                    if (key !== "type")
+                    if (key !== "type" && key !== "advanced")
                         flatTaskConfig(key, variable[key], obj)
                 })
                 break;

@@ -22,11 +22,16 @@ function CollapseContainer(props: {
     onHeaderMouseDown?: (event: any) => void
     onContextMenu?: (event: any) => void
     onExpand?: (event: any) => void
+    noAutoSave?: boolean
 }) {
-    const [expand, setExpand] = useState(props.expand);
+    let expandLocal = localStorage.getItem(`${props.label}Options`) ? localStorage.getItem(`${props.label}Options`) == "true" : props.expand;
+    if (props.noAutoSave)
+        expandLocal = props.expand;
+    const [expand, setExpand] = useState(expandLocal);
     const onClick = function (event: any) {
         if (!props.disableHeaderClick) {
             setExpand(!expand);
+            localStorage.setItem(`${props.label}Options`, (!expand).toString())
             if (props.onExpand) props.onExpand(!expand);
         }
         if (props.onClick) props.onClick(event);
