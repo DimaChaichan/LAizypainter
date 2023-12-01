@@ -14,7 +14,7 @@ It is recommended to use LCM Models to get fast (near real-time) results.
 # ![Demo 2](./assets/demo_2.gif)
 
 ### Install
-Download the current version `.ccx` under [Releases](./releases). \
+Download the current version `.ccx` under [Releases](https://github.com/DimaChaichan/LAizypainter/releases). \
 Open the file and install the plugin over Adobe Creative Cloud. \
 examples of tasks can also be found in the release. Download the Task.zip and unzip it.
 
