@@ -10,9 +10,7 @@ export function NumberField(props: {
     max?: number,
     onInput?: (value: string | undefined) => void
     label?: string
-    style?:
-        | string
-        | CSSProperties
+    style?: CSSProperties;
 }) {
     const input = useRef<HTMLInputElement>(null);
     const type = props.type ? props.type : "float";
@@ -36,6 +34,10 @@ export function NumberField(props: {
             return props.type === "int" ? Math.round(props.min) : props.min;
         if (props.max && value > props.max)
             return props.type === "int" ? Math.round(props.max) : props.max;
+        if(value === Infinity)
+            return Number.MAX_SAFE_INTEGER;
+        if(value === -Infinity)
+            return Number.MIN_SAFE_INTEGER;
         return value
     }
 
@@ -43,7 +45,7 @@ export function NumberField(props: {
         if (value !== undefined && value !== null) {
             let newVal: any = parseFloat(value.replace(",", "."))
             newVal = checkMinMax(newVal);
-
+            console.log(newVal)
             if (!isNumberInvalid(newVal)) {
                 if (props.type === "int")
                     newVal = Math.round(newVal);
@@ -87,13 +89,16 @@ export function NumberField(props: {
         updateValue(undefined);
     return (<div
         style={{
+            ...props.style,
             display: "flex",
         }}>
         <sp-textfield
             ref={input}
             value={props.value !== undefined && props.value !== null ? props.value.toString() : ""}
             onInput={handleNumberInput}
-            style={{width: "100%"}}>
+            style={{
+                width: "100%"
+            }}>
             {props.label ?
                 <sp-label slot="label"
                           className="theme-text">{props.label}
@@ -103,7 +108,7 @@ export function NumberField(props: {
         <div style={{
             display: "flex",
             flexDirection: "column",
-            width: "30px",
+            maxWidth: "30px",
             height: "33px",
             marginTop: "24px",
             marginRight: "3px"

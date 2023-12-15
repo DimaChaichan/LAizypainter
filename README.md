@@ -97,52 +97,7 @@ This makes it possible to build special tasks.
 The value **#image#** stands for the current image in Photoshop.
 
 ### Variables Types
-```
-- bool
-    - settings: value, label, advanced
-- text
-    - settings: value, label, advanced
-- textarea
-    - settings: value, label, advanced
-- int
-    - settings: value, label, advanced
-- number
-    - settings: value, label, advanced
-- slider
-    - settings: value, min, max, step, label, advanced
-- seed
-    - settings: value (random create a random value on load), label, advanced
-- combo
-    - settings: value, label, options, advanced
-- model
-    - settings: value, label, advanced
-- clip
-    - settings: value, label, advanced
-- clipVision
-    - settings: value, label, advanced
-- controlnet
-    - settings: value, label, advanced
-- diffusers
-    - settings: value, label, advanced
-- embeddings
-    - settings: value, label, advanced
-- gligen
-    - settings: value, label, advanced
-- hypernetworks
-    - settings: value, label, advanced
-- loras
-    - settings: value, label, advanced
-- styleModels
-    - settings: value, label, advanced
-- upscaleModels
-    - settings: value, label, advanced
-- vae
-    - settings: value, label, advanced
-- row
-    - is a container
-```
-**Strings** can be concatenated e.g. `"#positive#, cartoon style"`\
-**Numbers** can use expression e.g. `"#steps# + 10"`
+See here: [Variables](doc%2Fvariables.md)
 
 ### Debug Mode
 

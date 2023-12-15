@@ -41,6 +41,7 @@ export function TaskvariablesContainer() {
             {state.taskVariables.value ?
                 <>
                     <CollapseContainer
+                        style={{overflow: "hidden"}}
                         expand={true}
                         label={"Options"}
                         selected={false}>

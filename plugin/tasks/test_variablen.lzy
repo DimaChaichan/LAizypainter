@@ -72,8 +72,26 @@
     },
     "seed": {
       "type": "seed",
-      "value": 1111,
+      "value": 123456,
       "label": "Positive Prompt:"
+    },
+    "rowSeed": {
+      "type": "row",
+      "seed1": {
+        "type": "seed",
+        "value": "aaaaaa",
+        "label": "seed wrong value:"
+      },
+      "seed2": {
+        "type": "seed",
+        "value": -1,
+        "label": "Number random:"
+      },
+      "seed3": {
+        "type": "seed",
+        "value": "random",
+        "label": "Number random:"
+      }
     },
     "slider": {
       "type": "slider",
