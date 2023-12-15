@@ -13,8 +13,12 @@ It is recommended to use LCM Models to get fast (near real-time) results.
 # ![Demo 1](./assets/demo_1.gif)
 # ![Demo 2](./assets/demo_2.gif)
 
+### Requirements
+Min. Photoshop version: 25.0.0 (September 2023)\
+The Plugin need the [Permissions](https://developer.adobe.com/photoshop/uxp/2022/guides/uxp_guide/uxp-misc/manifest-v5) localFileSystem:request and network:domains:all. \
+**localFileSystem** for loading tasks, **network:domains** for connecting to a Stable Diffusion server
+
 ### Install
-Min. Photoshop version: 25.0.0 (September 2023)
 Download the current version `.ccx` under [Releases](https://github.com/DimaChaichan/LAizypainter/releases). \
 Open the file and install the plugin over Adobe Creative Cloud. \
 examples of tasks can also be found in the release. Download the Task.zip and unzip it.
@@ -52,20 +56,22 @@ The config area has some settings for the Task.
 
 ``` Json
   "config": {
+    "label": "Img2Img",
     "uploadSize": 1024,
     "mode": "loop"
   },
 ```
-
-**uploadSize:** means the largest side of the upload image. The default value is 512.\
+**label:** Set the label for the Task, default: Filename \
+**uploadSize:** means the largest side of the upload image, default: Document size\
 **mode:** The mode for the task. Currently there is "single" or "loop". In loop mode, the plugin waits for changes and
-executes the task again and again. The default value is loop.
+executes the task again and again. default: loop.
 
 In the Variables area you can define variables and use them in the prompt. e.g
 
 ``` Json
   "variables": {
     "positive": {
+      "type": "textarea",
       "type": "textarea",
       "value": "a cute cat",
       "label": "Positive Prompt:"

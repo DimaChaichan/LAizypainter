@@ -2,6 +2,7 @@ import {useContext} from "react";
 import {TaskVariable} from "./taskVariable.comp.tsx";
 import {AppState} from "../../main.tsx";
 import CollapseContainer from "../collapseContainer/collapseContainer.comp.tsx";
+import {flatTaskConfig} from "../../utils.tsx";
 
 export function TaskvariablesContainer() {
     const state = useContext(AppState);
@@ -13,6 +14,26 @@ export function TaskvariablesContainer() {
     advancedOptions = advancedOptions.filter(variable => {
         return variable !== undefined
     });
+    let advancedOptionsFlat: any = {};
+    for (let i = 0; i < advancedOptions.length; i++) {
+        flatTaskConfig(advancedOptions[i].key, advancedOptions[i], advancedOptionsFlat)
+    }
+
+    const validateAdvancedOptions = () => {
+        if (!advancedOptionsFlat)
+            return true;
+        const keys = Object.keys(advancedOptionsFlat);
+
+        for (let i = 0; i < keys.length; i++) {
+            const variable = state.taskVariablesFlat.value[keys[i]];
+            if (variable === undefined ||
+                variable === null ||
+                (typeof variable === "number" && isNaN(variable))) {
+                return false;
+            }
+        }
+        return true;
+    }
     return (
         <div style={{
             padding: "5px"
@@ -41,6 +62,7 @@ export function TaskvariablesContainer() {
                                         marginTop: "5px"
                                     }}
                                     expand={false}
+                                    invalid={!validateAdvancedOptions()}
                                     label={"Advanced Options"}
                                     noAutoSave={true}
                                     selected={false}>

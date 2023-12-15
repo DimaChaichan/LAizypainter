@@ -1,0 +1,100 @@
+{
+  "config": {
+    "label": "Test Variables",
+    "uploadSize": 1024,
+    "mode": "loop"
+  },
+  "variables": {
+    "boolNumber": {
+      "type": "row",
+      "bool": {
+        "type": "bool",
+        "value": true,
+        "label": "Bool:"
+      },
+      "bool2": {
+        "type": "bool",
+        "value": false,
+        "label": "Bool:"
+      }
+    },
+    "text": {
+      "type": "text",
+      "value": "Text",
+      "label": "Text:"
+    },
+    "textarea": {
+      "type": "textarea",
+      "value": "textarea",
+      "label": "textarea:"
+    },
+    "int": {
+      "type": "int",
+      "value": 1,
+      "label": "int:"
+    },
+    "rowint": {
+      "type": "row",
+      "int1": {
+        "type": "int",
+        "value": "aaaaaa",
+        "label": "int wrong value:"
+      },
+      "int2": {
+        "type": "int",
+        "value": 5,
+        "min": 0.01,
+        "max": 5,
+        "step": 0.01,
+        "label": "int error min. max:"
+      }
+    },
+    "number": {
+      "type": "number",
+      "value": 2.3,
+      "label": "Number:"
+    },
+    "rowNumber": {
+      "type": "row",
+      "number1": {
+        "type": "number",
+        "value": "aaaaaa",
+        "label": "Number wrong value:"
+      },
+      "number2": {
+        "type": "number",
+        "value": 5,
+        "min": 0.01,
+        "max": 1,
+        "step": 0.01,
+        "label": "Number min. max:"
+      }
+    },
+    "seed": {
+      "type": "seed",
+      "value": 1111,
+      "label": "Positive Prompt:"
+    },
+    "slider": {
+      "type": "slider",
+      "value": 0.8,
+      "min": 0.01,
+      "max": 1,
+      "step": 0.01,
+      "label": "Slider:"
+    },
+    "combo": {
+      "type": "combo",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "label": "Combo:"
+    },
+    "advanced": {
+    }
+  },
+  "prompt": {}
+}

@@ -1,7 +1,8 @@
 {
   "config": {
+    "label": "TEX2IMG",
     "uploadSize": 1024,
-    "mode": "loop"
+    "mode": "single"
   },
   "variables": {
     "positive": {
@@ -14,18 +15,9 @@
       "value": "text, watermark",
       "label": "Negative Prompt:"
     },
-    "denoise": {
-      "type": "slider",
-      "value": 0.8,
-      "min": 0.01,
-      "max": 1,
-      "step": 0.01,
-      "mapMax": 1,
-      "label": "AI Freedom (Denoise):"
-    },
     "row1": {
-      "type": "row",
       "advanced": true,
+      "type": "row",
       "seed": {
         "type": "seed",
         "value": "random",
@@ -33,21 +25,21 @@
       },
       "steps": {
         "type": "number",
-        "value": 20,
+        "value": 5,
         "label": "Steps:"
       }
     },
     "row2": {
-      "type": "row",
       "advanced": true,
+      "type": "row",
       "cfg": {
         "type": "number",
-        "value": 8,
+        "value": 1.3,
         "label": "CFG:"
       },
       "sampler": {
         "type": "combo",
-        "value": "euler",
+        "value": "lcm",
         "options": [
           "euler",
           "euler_ancestral",
@@ -85,11 +77,19 @@
         "label": "scheduler:"
       }
     },
-    "model": {
+    "row3": {
       "advanced": true,
-      "type": "model",
-      "value": "sd_xl_base_1.0.safetensors",
-      "label": "Model:"
+      "type": "row",
+      "model": {
+        "type": "model",
+        "value": "sd_xl_base_1.0.safetensors",
+        "label": "Model:"
+      },
+      "lora": {
+        "type": "lora",
+        "value": "lcm_lora_weights.safetensors",
+        "label": "LCM Lora:"
+      }
     }
   },
   "prompt": {
@@ -100,9 +100,9 @@
         "cfg": "#cfg#",
         "sampler_name": "#sampler#",
         "scheduler": "#scheduler#",
-        "denoise": "#denoise#",
+        "denoise": 1,
         "model": [
-          "4",
+          "11",
           0
         ],
         "positive": [
@@ -114,7 +114,7 @@
           0
         ],
         "latent_image": [
-          "24",
+          "5",
           0
         ]
       },
@@ -126,11 +126,19 @@
       },
       "class_type": "CheckpointLoaderSimple"
     },
+    "5": {
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage"
+    },
     "6": {
       "inputs": {
         "text": "#positive#",
         "clip": [
-          "4",
+          "11",
           1
         ]
       },
@@ -140,7 +148,7 @@
       "inputs": {
         "text": "#negative#",
         "clip": [
-          "4",
+          "11",
           1
         ]
       },
@@ -169,13 +177,21 @@
       },
       "class_type": "SaveImage"
     },
-    "24": {
+    "11": {
       "inputs": {
-        "width": 1024,
-        "height": 1024,
-        "batch_size": 1
+        "lora_name": "#lora#",
+        "strength_model": 1,
+        "strength_clip": 1,
+        "model": [
+          "4",
+          0
+        ],
+        "clip": [
+          "4",
+          1
+        ]
       },
-      "class_type": "EmptyLatentImage"
+      "class_type": "LoraLoader"
     }
   }
 }

@@ -1,45 +1,48 @@
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {AppState} from "../../main.tsx";
 import {randomSeed} from "../../utils.tsx";
 import {TaskVariableModels} from "./taskVariableModels.comp.tsx";
+import {NumberField} from "../numberField/numberField.comp.tsx";
 
 export function TaskVariable(props: {
     variable: ITaskVariable | any,
     name: string,
-    label: string
+    label: string,
 }) {
     const state = useContext(AppState);
+    // const variable = state.taskVariablesFlat.value[props.name];
+    const [invalid, setInvalid] = useState(false);
+    let value = state.taskVariablesFlat.value[props.name];
 
     let comp = null;
-    const serVariable = (value: any, rerun: boolean, timer?: number) => {
+    const setVariable = (value: any, rerun: boolean, timer?: number) => {
         state.taskVariablesFlat.value[props.name] = value;
-        state.saveTaskVariablesLocal();
+        state.validTask();
         if (rerun)
             state.rerunTask(timer);
+        state.saveTaskVariablesLocal()
     }
 
     const handleCheckboxChange = (event: any) => {
-        serVariable(event.target.checked, true);
+        setVariable(event.target.checked, true);
     };
     const handleTextInput = (event: any) => {
-        serVariable(event.target.value, true, 3000);
+        setVariable(event.target.value, true, 3000);
     };
-    const handleNumberInput = (event: any) => {
-        let newVal = event.target.value;
-        newVal = parseFloat(newVal.replace(",", "."))
-
-        if (!newVal) {
-            event.target.setAttribute('invalid', true)
-        } else {
-            event.target.removeAttribute('invalid')
-        }
-
+    const handleNumberInput = (changeValue: string | undefined) => {
+        setInvalid(!changeValue);
+        setVariable(changeValue, true, 2500);
         state.reRenderTaskVariables();
-        serVariable(newVal, true, 2500);
+    };
+    const handleIntInput = (event: any) => {
+        let newVal = event.target.value;
+        if (newVal.slice(-1) === "-")
+            return
+        handleNumberInput(event);
     };
 
     const handleSliderInput = (event: any) => {
-        serVariable(event.target.value, true, 1000);
+        setVariable(event.target.value, true, 1000);
     };
 
     switch (props.variable.type) {
@@ -48,7 +51,7 @@ export function TaskVariable(props: {
                 state.taskVariablesFlat.value[props.name] = false;
             }
             comp = (<sp-checkbox
-                checked={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name] : false}
+                checked={value ? value : false}
                 onChange={handleCheckboxChange}
                 style={{width: "100%"}}>
                 {props.label}
@@ -56,7 +59,7 @@ export function TaskVariable(props: {
             break;
         case "text":
             comp = (<sp-textfield
-                value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
+                value={value ? value.toString() : ""}
                 onInput={handleTextInput}
                 style={{width: "100%"}}>
                 <sp-label slot="label"
@@ -66,7 +69,7 @@ export function TaskVariable(props: {
             break;
         case "textarea":
             comp = (<sp-textarea onInput={handleTextInput}
-                                 value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
+                                 value={value ? value.toString() : ""}
                                  style={{width: "100%"}}>
                 <sp-label slot="label"
                           className="theme-text">{props.label}
@@ -74,45 +77,45 @@ export function TaskVariable(props: {
             </sp-textarea>)
             break;
         case "int":
-            comp = (<sp-textfield invalid={state.taskVariablesFlat.value[props.name] ? null : true}
-                                  value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
-                                  style={{width: "100%"}}
-                                  onInput={handleNumberInput}>
-                <sp-label slot="label"
-                          className="theme-text">{props.label}
-                </sp-label>
-            </sp-textfield>)
+            comp = (
+                <NumberField
+                    type={"int"}
+                    min={props.variable?.min}
+                    max={props.variable?.max}
+                    step={props.variable?.step}
+                    label={props.label}
+                    style={{width: "100%"}}
+                    value={value}
+                    onInput={handleNumberInput}/>)
             break;
         case "number":
-            comp = (<sp-textfield type="number"
-                                  invalid={state.taskVariablesFlat.value[props.name] ? null : true}
-                                  value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
-                                  onInput={handleNumberInput}
-                                  style={{width: "100%"}}>
-                <sp-label slot="label"
-                          className="theme-text">{props.label}
-                </sp-label>
-            </sp-textfield>)
+            comp = (
+                <NumberField
+                    min={props.variable?.min}
+                    max={props.variable?.max}
+                    step={props.variable?.step}
+                    label={props.label}
+                    style={{width: "100%"}}
+                    value={value}
+                    onInput={handleNumberInput}/>)
             break;
         case "seed":
-            if (state.taskVariablesFlat.value[props.name] === "random")
+            if (state.taskVariablesFlat.value[props.name] === -1)
                 state.taskVariablesFlat.value[props.name] = randomSeed();
             const handleSeedRandomClick = () => {
-                state.taskVariablesFlat.value[props.name] = randomSeed();
-                state.reRenderTaskVariables();
-                state.rerunTask();
+                setVariable(randomSeed(), true)
             };
             comp = (
                 <div style={{width: "100%", display: "flex"}}>
                     <sp-textfield invalid={state.taskVariablesFlat.value[props.name] ? null : true}
                                   value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name].toString() : ""}
                                   style={{width: "100%"}}
-                                  onInput={handleNumberInput}>
+                                  onInput={handleIntInput}>
                         <sp-label slot="label"
                                   className="theme-text">{props.label}
                         </sp-label>
                     </sp-textfield>
-                    <sp-action-button onClick={handleSeedRandomClick} style={{marginTop: "25px"}}>
+                    <sp-action-button onClick={handleSeedRandomClick} style={{marginTop: "25px", width: "25%"}}>
                         <div slot="icon" style="fill: currentColor">
                             <svg viewBox="0 0 36 36" style="width: 36px; height: 36px;">
                                 <rect id="Canvas" fill="#ff13dc" opacity="0" width="18" height="18"/>
@@ -195,8 +198,28 @@ export function TaskVariable(props: {
             )
             break
     }
-    return comp;
+
+    if (!comp)
+        return null;
+    return (
+        <div style={{
+            padding: "0 1px",
+            display: "flex",
+            width: "100%",
+        }}>
+            <div style={{
+                width: "100%",
+                border: "solid 1px transparent",
+                borderRadius: "5px",
+                padding: "0 1px"
+            }}
+                 className={invalid ? "theme-border-warning" : ""}>
+                {comp}
+            </div>
+        </div>
+    );
 }
+
 
 export interface ITaskVariable {
     type: "row" | "text" | "slider" | "bool" | "textarea" | "number"

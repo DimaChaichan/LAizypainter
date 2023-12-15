@@ -3,6 +3,7 @@ import CryptoJS from "crypto-js";
 import {action, core} from "photoshop";
 import Mexp from "math-expression-evaluator";
 import {EImageComfy} from "./store/store.tsx";
+import {ITaskVariable} from "./components/taskvariables/taskVariable.comp.tsx";
 
 /**
  * Open native File Dialog
@@ -176,6 +177,44 @@ export async function placeComfyImageAsLayer(image: EImageComfy | undefined, nam
         await tmpFile.write(arrayBuffer)
         await placeFileAsLayer(tmpFile);
     }
+}
+
+/**
+ * Flat Task Config
+ * @param name
+ * @param variable
+ * @param obj
+ */
+export function flatTaskConfig(name: string, variable: ITaskVariable | any, obj: any) {
+    switch (variable.type) {
+        case "row":
+            Object.keys(variable).map(key => {
+                if (key !== "type" && key !== "advanced" && key !== "key")
+                    flatTaskConfig(key, variable[key], obj)
+            })
+            break;
+        default:
+            if (obj[name])
+                throw new Error(`[ERROR] Config with the name: ${name} exist multiple times!`);
+            obj[name] = variable.value
+            break;
+    }
+}
+
+/**
+ * Check is Number Invalid
+ * @param number
+ */
+export function isNumberInvalid(number: number) {
+    if (number === undefined ||
+        number === null)
+        return true;
+
+    const type = typeof number;
+    if (type === "string")
+        return isNaN(parseFloat(String(number)));
+    return isNaN(number);
+
 }
 
 // #######################################################

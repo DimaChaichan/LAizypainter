@@ -248,7 +248,7 @@ export class Server {
             if (responseStop.status !== 200) {
                 app.showAlert(`[ERROR] Prompt task: ${responseStop.statusText} Status: ${responseStop.status}`)
             } else {
-                if (skip && self.taskConfig?.mode == "loop") {
+                if (skip && self.taskConfig?.mode === "loop") {
                     self.setTaskStatus(ETaskStatus.stop)
                     self.runTask();
                 } else {
@@ -285,6 +285,11 @@ export class Server {
         }, self.timerWait)
     }
 
+    validTask() {
+        const valid = this.validatePromptTask();
+        this.emitEvent(EServerEventTypes.onValidateTask, valid)
+    }
+
     private async prompt() {
         const self = this;
         let sameImage = false;
@@ -308,7 +313,9 @@ export class Server {
             return;
         }
 
-        if (!self.validatePromptTask()) {
+        const valid = self.validatePromptTask();
+        self.emitEvent(EServerEventTypes.onValidateTask, valid)
+        if (!valid) {
             self.runLoopTask();
             return;
         }
@@ -372,6 +379,8 @@ export class Server {
                 }
 
                 const promptText = self.createPromptTask();
+                if (!promptText)
+                    return
                 self.emitEvent(EServerEventTypes.sendPrompt, JSON.stringify(promptText, null, 4))
                 const responsePrompt = await self.fetch('/prompt', {
                     method: 'POST',
@@ -549,8 +558,10 @@ export class Server {
             return true;
         const keys = Object.keys(this.taskVariables);
         for (let i = 0; i < keys.length; i++) {
-            if (this.taskVariables[keys[i]] == undefined || this.taskVariables[keys[i]] == null) {
-                console.log(this.taskVariables)
+            const variable = this.taskVariables[keys[i]];
+            if (variable === undefined ||
+                variable === null ||
+                (typeof variable === "number" && isNaN(variable))) {
                 return false;
             }
         }
@@ -558,6 +569,9 @@ export class Server {
     }
 
     private createPromptTask() {
+        if (!this.validatePromptTask()) {
+            return;
+        }
         let taskCopy = JSON.parse(JSON.stringify(this.task)); // Deep Copy
         taskCopy.client_id = this.clientId;
         if (this.taskVariables) {
@@ -590,4 +604,5 @@ export enum EServerEventTypes {
     "getEmbeddings",
     "getHistory",
     "sendPrompt",
+    "onValidateTask"
 }

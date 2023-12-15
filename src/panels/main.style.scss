@@ -9,8 +9,15 @@ div[panelcontentid="main"] {
 }
 
 .theme-border {
-  height: 999999px;
   border: 1px solid;
   border-radius: 5px;
   @include theme-border-color;
+}
+
+.theme-color-warning {
+  @include theme-warning-color;
+}
+
+.theme-border-warning {
+  @include theme-border-color-warning;
 }

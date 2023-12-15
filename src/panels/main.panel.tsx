@@ -43,8 +43,8 @@ export function MainPanel() {
 
     const handleOpenTaskClick = () => {
         openFileDialog({
-            types: ['json'],
-            createPersistentToken: true
+            types: ['lzy'],
+            createPersistentToken: false
         }).then(file => {
             state.setTask(file).catch(error => app.showAlert(error))
         })
@@ -140,7 +140,7 @@ export function MainPanel() {
                                             onClick={handleStopClick}>
                                             Stop
                                         </sp-button>
-                                        {state.taskConfig.value.mode == "loop" ?
+                                        {state.taskConfig.value.mode === "loop" ?
                                             <sp-button
                                                 style={{
                                                     marginLeft: "5px"
@@ -165,10 +165,33 @@ export function MainPanel() {
                                                     padding: "0 15px"
                                                 }}>Task is pending...</sp-label>
                                                 :
-                                                <sp-label style={{
-                                                    width: "100%",
-                                                    padding: "0 15px"
-                                                }}>Waiting for changes!</sp-label>
+                                                <div
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: "0 15px"
+                                                    }}>
+                                                    <sp-label
+                                                        style={{
+                                                            margin: "0",
+                                                            padding: "0"
+                                                        }}>Waiting for changes!
+                                                    </sp-label>
+                                                    {!state.taskValid.value ?
+                                                        <>
+                                                            <br/>
+                                                            <sp-label
+                                                                style={{
+                                                                    margin: "0",
+                                                                    padding: "0"
+                                                                }}
+                                                                class="theme-color-warning">
+                                                                Some Variables are not set!
+                                                            </sp-label>
+                                                        </>
+                                                        :
+                                                        null}
+                                                </div>
+
                                         }
                                     </>
                                 }
@@ -202,11 +225,11 @@ export function MainPanel() {
                             height: "calc(100% - 100px)",
                             overflow: "auto"
                         }}>
+                        <ImagePreview/>
                         {state.taskName.value ?
                             <TaskvariablesContainer/>
                             : null
                         }
-                        <ImagePreview/>
                         <History/>
                         {debug.value ?
                             <Debug/>

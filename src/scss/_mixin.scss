@@ -46,6 +46,21 @@
   }
 }
 
+@mixin theme-border-color-warning {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    border-color: $warning-darkest !important;
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    border-color: $warning-dark !important;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    border-color: $warning-lightest !important;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    border-color: $warning-light !important;
+  }
+}
+
 
 @mixin theme-background {
   @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {

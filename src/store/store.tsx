@@ -2,7 +2,7 @@ import {storage} from "uxp";
 import {app} from "photoshop";
 import {signal} from "@preact/signals";
 import {EServerEventTypes, Server} from "../server/server.tsx";
-import {ITaskVariable} from "../components/taskvariables/taskVariable.comp.tsx";
+import {flatTaskConfig} from "../utils.tsx";
 
 
 /**
@@ -20,6 +20,7 @@ export function createAppState() {
 
     let task: any;
     const taskName = signal<string | undefined>(undefined);
+    const taskValid = signal<boolean>(false);
     const taskConfig = signal<ETaskConfig>({
         mode: "loop",
         uploadSize: 512
@@ -53,21 +54,6 @@ export function createAppState() {
     })
     const lastPrompt = signal<string>('')
     let rerunTimer: number;
-    const flatTaskConfig = (name: string, variable: ITaskVariable | any, obj: any) => {
-        switch (variable.type) {
-            case "row":
-                Object.keys(variable).map(key => {
-                    if (key !== "type" && key !== "advanced")
-                        flatTaskConfig(key, variable[key], obj)
-                })
-                break;
-            default:
-                if (obj[name])
-                    throw new Error(`[ERROR] Config with the name: ${name} exist multiple times!`);
-                obj[name] = variable.value
-                break;
-        }
-    }
 
     server.on(EServerEventTypes.changeStatus, (data) => {
         serverStatus.value = data;
@@ -99,6 +85,9 @@ export function createAppState() {
     server.on(EServerEventTypes.error, () => {
         app.showAlert(`Can't connect to the Server: ${serverUrl.value}`)
     })
+    server.on(EServerEventTypes.onValidateTask, (valid) => {
+        taskValid.value = valid;
+    })
     server.on(EServerEventTypes.previewImage, (imageBlob) => {
         if (previewImageUrl.value)
             window.URL.revokeObjectURL(previewImageUrl.value);
@@ -119,7 +108,7 @@ export function createAppState() {
     }
 
     const startLoop = () => {
-        if (serverStatus.value == EServerStatus.connected) {
+        if (serverStatus.value === EServerStatus.connected) {
             server.startLoop();
         }
     }
@@ -155,12 +144,18 @@ export function createAppState() {
             return
         localStorage.setItem(`${taskVariables.value.name}_task`, JSON.stringify(taskVariablesFlat.value))
     }
+    const validTask = () => {
+        server.validTask()
+    }
     // TODO: Clean this Function, to much duplication, to noise
     const setTask = async (file: storage.File | undefined) => {
         if (file) {
             let data = JSON.parse((await file.read({format: storage.formats.utf8})).toString())
             if (!data.hasOwnProperty('prompt'))
-                data = {prompt: data}
+                throw "Task has no Prompt section!"
+            if (typeof data["prompt"] !== "object")
+                throw "Prompt section is not a Object!"
+
             if (data.hasOwnProperty('config')) {
                 taskConfig.value = {
                     mode: data.config.mode ? data.config.mode : 'loop',
@@ -176,20 +171,19 @@ export function createAppState() {
                         flatTaskConfig(key, data.variables[key], variables)
                     })
                 } catch (e: any) {
-                    app.showAlert(e)
+                    app.showAlert("[ERROR] FlatTask " + e)
                     return
                 }
-                data.variables.name = file.name;
                 taskVariables.value = data.variables;
 
-                const localVariableString = localStorage.getItem(`${taskVariables.value.name}_task`)
-                if (localVariableString) {
-                    const localVariable = JSON.parse(localVariableString);
-                    Object.keys(localVariable).map(key => {
-                        if (variables.hasOwnProperty(key) && variables[key] !== "random")
-                            variables[key] = localVariable[key]
-                    })
-                }
+                // const localVariableString = localStorage.getItem(`${taskVariables.value.name}_task`)
+                // if (localVariableString) {
+                //     const localVariable = JSON.parse(localVariableString);
+                //     Object.keys(localVariable).map(key => {
+                //         if (variables.hasOwnProperty(key) && variables[key] !== "random")
+                //             variables[key] = localVariable[key]
+                //     })
+                // }
 
                 taskVariablesFlat.value = variables
             } else {
@@ -199,7 +193,7 @@ export function createAppState() {
 
             task = data;
             server.task = task;
-            taskName.value = file.name;
+            taskName.value = data.config.label ? data.config.label : file.name;
             previewImageUrl.value = '';
             server.taskConfig = taskConfig.value;
             server.taskVariables = taskVariablesFlat.value;
@@ -213,6 +207,7 @@ export function createAppState() {
             server.taskVariables = undefined;
             previewImageUrl.value = '';
         }
+        server.validTask();
     }
 
     return {
@@ -233,10 +228,12 @@ export function createAppState() {
         taskProgress,
 
         taskName,
+        taskValid,
         taskConfig,
         taskVariables,
         taskVariablesFlat,
         saveTaskVariablesLocal,
+        validTask,
         reRenderTaskVariables,
         rerunTask,
         setTask,

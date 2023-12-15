@@ -15,6 +15,7 @@ function CollapseContainer(props: {
     expand: boolean,
     selected: boolean,
     children: JSX.Element,
+    invalid?: boolean,
     disableHeaderClick?: boolean,
     actions?: JSX.Element,
     onClick?: (event: any) => void
@@ -24,7 +25,7 @@ function CollapseContainer(props: {
     onExpand?: (event: any) => void
     noAutoSave?: boolean
 }) {
-    let expandLocal = localStorage.getItem(`${props.label}Options`) ? localStorage.getItem(`${props.label}Options`) == "true" : props.expand;
+    let expandLocal = localStorage.getItem(`${props.label}Options`) ? localStorage.getItem(`${props.label}Options`) === "true" : props.expand;
     if (props.noAutoSave)
         expandLocal = props.expand;
     const [expand, setExpand] = useState(expandLocal);
@@ -42,7 +43,7 @@ function CollapseContainer(props: {
     }
     return (
         <div
-            className={`collapse-container ${props.className} ` + (props.selectedBackground ? "collapse-container-selected-bg" : "")}
+            className={`collapse-container ${props.invalid ? "theme-border-warning" : ""} ${props.className} ` + (props.selectedBackground ? "collapse-container-selected-bg" : "")}
             onContextMenu={props.onContextMenu}
             onMouseDown={props.onMouseDown}
             style={props.style}>
@@ -81,6 +82,15 @@ function CollapseContainer(props: {
                     </sp-action-button>}
                 <sp-label className="collapse-container-header-label">{props.label}</sp-label>
                 {props.actions}
+                {props.invalid ?
+                    <div style={{
+                        marginLeft: "auto",
+                        paddingRight: "10px"
+                    }}>
+                        <sp-icon class="theme-color-warning" name="ui:AlertMedium"></sp-icon>
+                    </div>
+                    :
+                    null}
             </div>
             <div className={"collapse-container-children " + (!expand ? "collapse-container-children-close" : "")}>
                 {props.children}
