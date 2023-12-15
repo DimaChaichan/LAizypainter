@@ -15,10 +15,8 @@ export function TaskVariable(props: {
     const [invalid, setInvalid] = useState(false);
 
     let comp = null;
-    const setVariable = (value: any, rerun: boolean, timer?: number) => {
-        state.taskVariablesFlat.value[props.name] = value;
-        setInvalid(!value);
-        state.validTask();
+    const setVariable = (newValue: any, rerun: boolean, timer?: number) => {
+        state.taskVariablesFlat.value[props.name] = newValue;
         if (rerun)
             state.rerunTask(timer);
         state.saveTaskVariablesLocal()
@@ -28,9 +26,15 @@ export function TaskVariable(props: {
         setVariable(event.target.checked, true);
     };
     const handleTextInput = (event: any) => {
+        if (props.variable.required) {
+            setInvalid(!event.target.value);
+            state.validTask();
+        }
         setVariable(event.target.value, true, 3000);
     };
     const handleNumberInput = (changeValue: string | undefined) => {
+        setInvalid(!changeValue);
+        state.validTask();
         setVariable(changeValue, true, 2500);
         state.reRenderTaskVariables();
     };
@@ -41,13 +45,15 @@ export function TaskVariable(props: {
 
     const handleSeedRandomClick = () => {
         setVariable(randomSeed().toString(), true);
+        setInvalid(false);
+        state.validTask();
         state.reRenderTaskVariables();
     };
 
     switch (props.variable.type) {
         case "bool":
-            if (typeof state.taskVariablesFlat.value[props.name] !== "boolean") {
-                state.taskVariablesFlat.value[props.name] = false;
+            if (typeof value !== "boolean") {
+                value = false;
             }
             comp = (<sp-checkbox
                 checked={value ? value : false}
@@ -98,8 +104,10 @@ export function TaskVariable(props: {
                     onInput={handleNumberInput}/>)
             break;
         case "seed":
-            if (value === "random")
-                value = randomSeed();
+            if (value === "random") {
+                state.taskVariablesFlat.value[props.name] = randomSeed().toString();
+                value = state.taskVariablesFlat.value[props.name];
+            }
             comp = (
                 <SeedField
                     max={props.variable?.max}
@@ -115,7 +123,7 @@ export function TaskVariable(props: {
                 min={props.variable.min ? props.variable.min : 0}
                 max={props.variable.max ? props.variable.max : 100}
                 step={props.variable.step ? props.variable.step : 1}
-                value={state.taskVariablesFlat.value[props.name] ? state.taskVariablesFlat.value[props.name] : 0}
+                value={value ? value : 0}
                 style={{width: "100%", padding: "0px 5px"}}>
                 <sp-label slot="label">{props.label}</sp-label>
             </sp-slider>)
@@ -179,7 +187,7 @@ export function TaskVariable(props: {
             )
             break
     }
-
+    console.log(state.taskVariablesFlat.value)
     if (!comp)
         return null;
     return (

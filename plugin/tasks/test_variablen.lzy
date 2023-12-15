@@ -28,6 +28,21 @@
       "value": "textarea",
       "label": "textarea:"
     },
+    "rowText": {
+      "type": "row",
+      "text2": {
+        "type": "text",
+        "required": true,
+        "value": "Text",
+        "label": "Text required:"
+      },
+      "textarea2": {
+        "type": "textarea",
+        "required": "required",
+        "value": "textarea",
+        "label": "textarea required:"
+      }
+    },
     "int": {
       "type": "int",
       "value": 1,

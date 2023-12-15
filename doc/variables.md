@@ -10,12 +10,14 @@ settings:
 type: text \
 settings:
 - **value:** string value
+- **required:** bool value
 - **label:** Variable label
 
 ### Textarea
 type: textarea \
 settings:
 - **value:** string value
+- **required:** bool value
 - **label:** Variable label
 
 ### Integer
