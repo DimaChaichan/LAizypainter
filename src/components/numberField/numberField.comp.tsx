@@ -45,7 +45,6 @@ export function NumberField(props: {
         if (value !== undefined && value !== null) {
             let newVal: any = parseFloat(value.replace(",", "."))
             newVal = checkMinMax(newVal);
-            console.log(newVal)
             if (!isNumberInvalid(newVal)) {
                 if (props.type === "int")
                     newVal = Math.round(newVal);

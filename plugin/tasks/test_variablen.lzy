@@ -18,6 +18,55 @@
         "label": "Bool:"
       }
     },
+    "combo1": {
+      "type": "combo",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "label": "Combo:"
+    },
+    "boolRow": {
+      "type": "row",
+      "combo2": {
+        "type": "combo",
+        "value": "aaaaa",
+        "options": [
+          "1",
+          "2",
+          "3"
+        ],
+        "label": "Combo error:"
+      },
+      "combo3": {
+        "type": "combo",
+        "value": "1",
+        "options": [
+          "1",
+          "1 j aslfas filgsajfgsa jlfh",
+          "2 adofhsa jghsa ighsa iug",
+          "3lkh asfkas gkabjkjbjgka,",
+          "1 j aslfas filgsajfgsa jlfh",
+          "2 adofhsa jghsa ighsa iug",
+          "3lkh asfkas gkabjkjbjgka,",
+          "1 j aslfas filgsajfgsa jlfh",
+          "2 adofhsa jghsa ighsa iug",
+          "3lkh asfkas gkabjkjbjgka,",
+          "1 j aslfas filgsajfgsa jlfh",
+          "2 adofhsa jghsa ighsa iug",
+          "3lkh asfkas gkabjkjbjgka,",
+          "1 j aslfas filgsajfgsa jlfh",
+          "2 adofhsa jghsa ighsa iug",
+          "3lkh asfkas gkabjkjbjgka,",
+          "1 j aslfas filgsajfgsa jlfh",
+          "2 adofhsa jghsa ighsa iug",
+          "3lkh asfkas gkabjkjbjgka,"
+        ],
+        "label": "Combo error:"
+      }
+    },
     "text": {
       "type": "text",
       "value": "Text",
@@ -116,14 +165,9 @@
       "step": 0.01,
       "label": "Slider:"
     },
-    "combo": {
-      "type": "combo",
-      "value": "1",
-      "options": [
-        "1",
-        "2",
-        "3"
-      ],
+    "model": {
+      "type": "model",
+      "value": "sd_xl_turbo_1.0.safetensors",
       "label": "Combo:"
     },
     "advanced": {

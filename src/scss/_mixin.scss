@@ -77,6 +77,21 @@
   }
 }
 
+@mixin theme-background-textfield {
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
+    background-color: #080808;
+  }
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: dark) {
+    background-color: #242424;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: lightest) {
+    background-color: #FFFFFF;
+  }
+  @media (prefers-color-scheme: light), (prefers-color-scheme: light) {
+    background-color: #FFFFFF;
+  }
+}
+
 @mixin theme-background-selected {
   @media (prefers-color-scheme: dark), (prefers-color-scheme: darkest) {
     background-color: lighten($background-darkest, 5%);

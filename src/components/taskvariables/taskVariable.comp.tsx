@@ -1,25 +1,35 @@
 import {useContext, useState} from "react";
 import {AppState} from "../../main.tsx";
 import {randomSeed} from "../../utils.tsx";
-import {TaskVariableModels} from "./taskVariableModels.comp.tsx";
 import {NumberField} from "../numberField/numberField.comp.tsx";
 import {SeedField} from "../seedInput/seedInput.comp.tsx";
+import {ComboBox} from "../comboBox/comboBox.comp.tsx";
 
 export function TaskVariable(props: {
     variable: ITaskVariable | any,
     name: string,
     label: string,
 }) {
+    let comp = null;
     const state = useContext(AppState);
     let value = state.taskVariablesFlat.value[props.name];
+
     const [invalid, setInvalid] = useState(false);
 
-    let comp = null;
+    // #######################################################
+    // Helper
+
     const setVariable = (newValue: any, rerun: boolean, timer?: number) => {
         state.taskVariablesFlat.value[props.name] = newValue;
         if (rerun)
             state.rerunTask(timer);
         state.saveTaskVariablesLocal()
+    }
+
+    const checkComboMenuValue = (options: Array<string>, value: string) => {
+        if (!value)
+            return true;
+        return !options.some(option => option === value);
     }
 
     const handleCheckboxChange = (event: any) => {
@@ -32,6 +42,15 @@ export function TaskVariable(props: {
         }
         setVariable(event.target.value, true, 3000);
     };
+    const handleOnChangeComboBox = (option: string) => {
+        setInvalid(option === "");
+        state.validTask();
+        setVariable(option, true);
+    };
+
+    // #######################################################
+    // Events
+
     const handleNumberInput = (changeValue: string | undefined) => {
         setInvalid(!changeValue);
         state.validTask();
@@ -129,48 +148,111 @@ export function TaskVariable(props: {
             </sp-slider>)
             break;
         case "model":
-            comp = (<TaskVariableModels models={state.models.value.checkpoints} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.checkpoints, value));
+            comp = (<ComboBox options={state.models.value.checkpoints}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "clip":
-            comp = (<TaskVariableModels models={state.models.value.clip} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.clip, value));
+            comp = (<ComboBox options={state.models.value.clip}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "clipVision":
-            comp = (<TaskVariableModels models={state.models.value.clipVision} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.clipVision, value));
+            comp = (<ComboBox options={state.models.value.clipVision}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "controlNet":
-            comp = (<TaskVariableModels models={state.models.value.controlnet} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.controlnet, value));
+            comp = (<ComboBox options={state.models.value.controlnet}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "diffusers":
-            comp = (<TaskVariableModels models={state.models.value.diffusers} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.diffusers, value));
+            comp = (<ComboBox options={state.models.value.diffusers}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "embeddings":
-            comp = (<TaskVariableModels models={state.models.value.embeddings} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.embeddings, value));
+            comp = (<ComboBox options={state.models.value.embeddings}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "gligen":
-            comp = (<TaskVariableModels models={state.models.value.gligen} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.gligen, value));
+            comp = (<ComboBox options={state.models.value.gligen}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "hypernetworks":
-            comp = (
-                <TaskVariableModels models={state.models.value.hypernetworks} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.hypernetworks, value));
+            comp = (<ComboBox options={state.models.value.hypernetworks}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "lora":
-            comp = (<TaskVariableModels models={state.models.value.loras} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.loras, value));
+            comp = (<ComboBox options={state.models.value.loras}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "styleModels":
-            comp = (<TaskVariableModels models={state.models.value.styleModels} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.styleModels, value));
+            comp = (<ComboBox options={state.models.value.styleModels}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "upscaleModels":
-            comp = (
-                <TaskVariableModels models={state.models.value.upscaleModels} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.upscaleModels, value));
+            comp = (<ComboBox options={state.models.value.upscaleModels}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "vae":
-            comp = (<TaskVariableModels models={state.models.value.vae} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(state.models.value.vae, value));
+            comp = (<ComboBox options={state.models.value.vae}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "combo":
             let comboOptions: Array<string> = [];
             if (props.variable.hasOwnProperty("options"))
                 comboOptions = props.variable["options"]
-            comp = (<TaskVariableModels models={comboOptions} label={props.label} name={props.name}/>)
+            setInvalid(checkComboMenuValue(comboOptions, value));
+            comp = (<ComboBox options={comboOptions}
+                              onChange={handleOnChangeComboBox}
+                              label={props.label}
+                              value={value}
+                              minMenuWidth={300}/>)
             break;
         case "row":
             comp = (
@@ -187,7 +269,6 @@ export function TaskVariable(props: {
             )
             break
     }
-    console.log(state.taskVariablesFlat.value)
     if (!comp)
         return null;
     return (
