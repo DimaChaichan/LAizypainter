@@ -169,10 +169,10 @@ export function createAppState() {
             if (data.hasOwnProperty('config')) {
                 taskConfig.value = {
                     mode: data.config.mode ? data.config.mode : 'loop',
-                    uploadSize: data.config.uploadSize ? data.config.uploadSize : 512
+                    uploadSize: data.config.uploadSize ? data.config.uploadSize : undefined
                 }
             } else {
-                taskConfig.value = {mode: "loop", uploadSize: 512};
+                taskConfig.value = {mode: "loop", uploadSize: undefined};
             }
             if (data.hasOwnProperty('variables')) {
                 let variables: any = {};
@@ -214,7 +214,7 @@ export function createAppState() {
             taskVariablesFlat.value = undefined;
             server.task = task;
             taskName.value = undefined;
-            server.taskConfig = {mode: "loop", uploadSize: 512};
+            server.taskConfig = {mode: "loop", uploadSize: undefined};
             server.taskVariables = undefined;
             previewImageUrl.value = '';
         }
@@ -285,7 +285,7 @@ export interface EImageComfy {
 
 export interface ETaskConfig {
     mode: "single" | "loop"
-    uploadSize: number
+    uploadSize: number | undefined
 }
 
 export enum EServerStatus {

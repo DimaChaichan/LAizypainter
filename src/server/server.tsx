@@ -11,7 +11,7 @@ export class Server {
     socket: WebSocket | undefined;
 
     task: any;
-    taskConfig: ETaskConfig = {mode: "loop", uploadSize: 512};
+    taskConfig: ETaskConfig = {mode: "loop", uploadSize: undefined};
     taskVariables: any;
 
     clientId = "photoshopclient";
@@ -337,7 +337,7 @@ export class Server {
         }
 
         await core.executeAsModal(async () => {
-            let imageMaxSize = 512;
+            let imageMaxSize = Math.max(app.activeDocument.height, app.activeDocument.width);
             if (this.taskConfig?.uploadSize)
                 imageMaxSize = this.taskConfig?.uploadSize;
 
