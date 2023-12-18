@@ -24,73 +24,72 @@
       "mapMax": 1,
       "label": "AI Freedom (Denoise):"
     },
-    "row1": {
-      "type": "row",
-      "advanced": true,
-      "seed": {
-        "type": "seed",
-        "value": "random",
-        "label": "Seed:"
+    "advanced": {
+      "row1": {
+        "type": "row",
+        "seed": {
+          "type": "seed",
+          "value": "random",
+          "label": "Seed:"
+        },
+        "steps": {
+          "type": "number",
+          "value": 20,
+          "label": "Steps:"
+        }
       },
-      "steps": {
-        "type": "number",
-        "value": 20,
-        "label": "Steps:"
+      "row2": {
+        "type": "row",
+        "cfg": {
+          "type": "number",
+          "value": 8,
+          "label": "CFG:"
+        },
+        "sampler": {
+          "type": "combo",
+          "value": "euler",
+          "options": [
+            "euler",
+            "euler_ancestral",
+            "heun",
+            "heunpp2",
+            "dpm_2",
+            "dpm_2_ancestral",
+            "lms",
+            "dpm_fast",
+            "dpm_adaptive",
+            "dpmpp_2s_ancestral",
+            "dpmpp_sde",
+            "dpmpp_sde_gpu",
+            "dpmpp_2m",
+            "dpmpp_2m_sde",
+            "dpmpp_2m_sde_gpu",
+            "dpmpp_3m_sde",
+            "dpmpp_3m_sde_gpu",
+            "ddpm",
+            "lcm"
+          ],
+          "label": "Sampler:"
+        },
+        "scheduler": {
+          "type": "combo",
+          "value": "normal",
+          "options": [
+            "normal",
+            "karras",
+            "exponential",
+            "sgm_uniform",
+            "simple",
+            "ddim_uniform"
+          ],
+          "label": "scheduler:"
+        }
+      },
+      "model": {
+        "type": "model",
+        "value": "sd_xl_base_1.0.safetensors",
+        "label": "Model:"
       }
-    },
-    "row2": {
-      "type": "row",
-      "advanced": true,
-      "cfg": {
-        "type": "number",
-        "value": 8,
-        "label": "CFG:"
-      },
-      "sampler": {
-        "type": "combo",
-        "value": "euler",
-        "options": [
-          "euler",
-          "euler_ancestral",
-          "heun",
-          "heunpp2",
-          "dpm_2",
-          "dpm_2_ancestral",
-          "lms",
-          "dpm_fast",
-          "dpm_adaptive",
-          "dpmpp_2s_ancestral",
-          "dpmpp_sde",
-          "dpmpp_sde_gpu",
-          "dpmpp_2m",
-          "dpmpp_2m_sde",
-          "dpmpp_2m_sde_gpu",
-          "dpmpp_3m_sde",
-          "dpmpp_3m_sde_gpu",
-          "ddpm",
-          "lcm"
-        ],
-        "label": "Sampler:"
-      },
-      "scheduler": {
-        "type": "combo",
-        "value": "normal",
-        "options": [
-          "normal",
-          "karras",
-          "exponential",
-          "sgm_uniform",
-          "simple",
-          "ddim_uniform"
-        ],
-        "label": "scheduler:"
-      }
-    },
-    "model": {
-      "advanced": true,
-      "type": "model",
-      "value": "sd_xl_base_1.0.safetensors",
-      "label": "Model:"
     }
   },
   "prompt": {

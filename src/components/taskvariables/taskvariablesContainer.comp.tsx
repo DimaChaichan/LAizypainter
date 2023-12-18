@@ -7,19 +7,21 @@ import {flatTaskConfig} from "../../utils.tsx";
 export function TaskvariablesContainer() {
     const state = useContext(AppState);
     const taskValid = state.taskValid;
-    let advancedOptions = Object.keys(state.taskVariables.value).map(key => {
-        const variable = state.taskVariables.value[key];
-        variable.key = key;
-        return variable.hasOwnProperty('advanced') && variable['advanced'] ? variable : undefined
-    })
-    advancedOptions = advancedOptions.filter(variable => {
-        return variable !== undefined
-    });
+    let advancedOptions = [];
+    if (state.taskVariables.value.hasOwnProperty("advanced")) {
+        advancedOptions = Object.keys(state.taskVariables.value["advanced"]).map(key => {
+            const variable = state.taskVariables.value["advanced"][key];
+            variable.key = key;
+            return variable;
+        })
+        advancedOptions = advancedOptions.filter((variable: any) => {
+            return variable !== undefined
+        });
+    }
     let advancedOptionsFlat: any = {};
     for (let i = 0; i < advancedOptions.length; i++) {
         flatTaskConfig(advancedOptions[i].key, advancedOptions[i], advancedOptionsFlat)
     }
-
     const validateAdvancedOptions = () => {
         if (!advancedOptionsFlat)
             return true;
@@ -74,7 +76,7 @@ export function TaskvariablesContainer() {
                                         margin: "3px"
                                     }}>
                                         {
-                                            advancedOptions.map(variable => {
+                                            advancedOptions.map((variable: any) => {
                                                 if (!variable)
                                                     return
                                                 return (<TaskVariable

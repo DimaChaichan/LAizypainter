@@ -194,7 +194,6 @@ export function createAppState() {
                 //             variables[key] = localVariable[key]
                 //     })
                 // }
-
                 taskVariablesFlat.value = variables
             } else {
                 taskVariables.value = undefined;

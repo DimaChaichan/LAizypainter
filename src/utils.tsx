@@ -189,9 +189,16 @@ export function flatTaskConfig(name: string, variable: ITaskVariable | any, obj:
     switch (variable.type) {
         case "row":
             Object.keys(variable).map(key => {
-                if (key !== "type" && key !== "advanced" && key !== "key")
+                if (key !== "type" && key !== "key")
                     flatTaskConfig(key, variable[key], obj)
             })
+            break;
+        case undefined:
+            if (name === "advanced")
+                Object.keys(variable).map(key => {
+                    if (key !== "type" && key !== "key")
+                        flatTaskConfig(key, variable[key], obj)
+                })
             break;
         default:
             if (obj[name])

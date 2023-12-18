@@ -74,6 +74,18 @@ A row is a container
 ### Advance
 All variables in the key advance will appear as "Advanced Options"
 
+```json
+...
+"advanced": {
+        "steps": {
+          "type": "number",
+          "value": 5,
+          "label": "Steps:"
+        }
+      },
+...
+```
+
 ### Tips
 The Value **-1** will be replaced with a random seed\
 **Strings** can be concatenated e.g. `"#positive#, cartoon style"`\
