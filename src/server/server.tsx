@@ -1,6 +1,6 @@
 import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
 import {app, core, imaging} from "photoshop";
-import {createFileInDataFolder, findValAndReplace, map, MD5, randomSeed, serializeImageComfyData} from "../utils.tsx";
+import {createFileInDataFolder, findValAndReplace, map, randomSeed, serializeImageComfyData} from "../utils.tsx";
 
 /**
  * Websocket server to communicate with ComfyUI Server (https://github.com/comfyanonymous/ComfyUI)
@@ -28,7 +28,7 @@ export class Server {
     }> = [];
 
     imageName = 'upload';
-    imageHash = "";
+    lastHistoryLength = -1;
 
     timer: any;
     timerWait = 2000;
@@ -207,13 +207,9 @@ export class Server {
         if (!this.isConnected) {
             return;
         }
-        self.imageHash = "";
+        self.lastHistoryLength = -1;
         self.setLoopStatus(ELoopStatus.run)
         self.runTask()
-    }
-
-    cleanImageHash() {
-        this.imageHash = '';
     }
 
     stopLoop(skip?: boolean) {
@@ -345,15 +341,12 @@ export class Server {
             if (app.activeDocument.height > app.activeDocument.width)
                 size = {height: imageMaxSize}
 
-            const pixelData = await imaging.getPixels({targetSize: size, applyAlpha: true});
-            const hash = MD5(await pixelData.imageData.getData({}));
-
-            if (hash === self.imageHash) {
+            if (self.lastHistoryLength === app.activeDocument.historyStates.length) {
                 self.setTaskStatus(ETaskStatus.done)
                 sameImage = true;
-                await pixelData.imageData.dispose();
             } else {
-                self.imageHash = hash;
+                self.lastHistoryLength = app.activeDocument.historyStates.length;
+                const pixelData = await imaging.getPixels({targetSize: size, applyAlpha: true});
                 self.setTaskStatus(ETaskStatus.pending)
 
                 let jpegData = await imaging.encodeImageData({"imageData": pixelData.imageData, "base64": false});
@@ -399,7 +392,7 @@ export class Server {
                 self.promptId = responseData.prompt_id;
             }
         }, {"commandName": 'Send Prompt'});
-
+        console.log("aa", sameImage)
         if (sameImage) {
             self.runLoopTask();
         }
@@ -414,7 +407,7 @@ export class Server {
 
     private clearTask() {
         this.timer = undefined;
-        this.cleanImageHash();
+        this.lastHistoryLength = -1;
         this.setTaskStatus(ETaskStatus.stop)
         this.setLoopStatus(ELoopStatus.stop)
     }

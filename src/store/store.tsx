@@ -126,11 +126,11 @@ export function createAppState() {
 
         if (timer) {
             rerunTimer = setTimeout(() => {
-                server.imageHash = "";
+                server.lastHistoryLength = -1;
                 server.taskVariables = taskVariablesFlat.value;
             }, timer)
         } else {
-            server.imageHash = "";
+            server.lastHistoryLength = -1;
             server.taskVariables = taskVariablesFlat.value;
         }
     }
