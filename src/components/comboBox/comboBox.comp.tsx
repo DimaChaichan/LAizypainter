@@ -26,10 +26,14 @@ export function ComboBox(props: {
             return value;
         return props.options.find(option => option === value)
     }
-
+    const checkValueIndex = (value: string | undefined) => {
+        if (!value)
+            return 0;
+        return props.options.findIndex(option => option === value)
+    }
     const [value, setValue] = useState<string | undefined>(checkValue(props.value));
     const [query, setQuery] = useState("");
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [selectedIndex, setSelectedIndex] = useState(checkValueIndex(props.value));
     const [menuWidth, setMenuWidth] = useState(getMenuWidth());
 
     const handleOnclickOpenCloseBtn = () => {
