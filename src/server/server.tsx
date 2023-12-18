@@ -576,7 +576,8 @@ export class Server {
         taskCopy.client_id = this.clientId;
         if (this.taskVariables) {
             Object.keys(this.taskVariables).map(key => {
-                findValAndReplace(taskCopy, `#${key}#`, this.taskVariables[key])
+                const value = this.taskVariables[key] === -1 || this.taskVariables[key] === "-1" ? randomSeed() : this.taskVariables[key];
+                findValAndReplace(taskCopy, `#${key}#`, value)
             })
         }
         findValAndReplace(taskCopy, '#image#', this.getImageName())

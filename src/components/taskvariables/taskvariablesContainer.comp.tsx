@@ -6,6 +6,7 @@ import {flatTaskConfig} from "../../utils.tsx";
 
 export function TaskvariablesContainer() {
     const state = useContext(AppState);
+    const taskValid = state.taskValid;
     let advancedOptions = Object.keys(state.taskVariables.value).map(key => {
         const variable = state.taskVariables.value[key];
         variable.key = key;
@@ -43,6 +44,7 @@ export function TaskvariablesContainer() {
                     <CollapseContainer
                         style={{overflow: "hidden"}}
                         expand={true}
+                        invalid={!taskValid.value}
                         label={"Options"}
                         selected={false}>
                         <>
@@ -63,7 +65,7 @@ export function TaskvariablesContainer() {
                                         marginTop: "5px"
                                     }}
                                     expand={false}
-                                    invalid={!validateAdvancedOptions()}
+                                    invalid={!taskValid.value && !validateAdvancedOptions()}
                                     label={"Advanced Options"}
                                     noAutoSave={true}
                                     selected={false}>

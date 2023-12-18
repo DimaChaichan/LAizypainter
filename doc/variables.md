@@ -75,5 +75,6 @@ A row is a container
 All variables in the key advance will appear as "Advanced Options"
 
 ### Tips
+The Value **-1** will be replaced with a random seed\
 **Strings** can be concatenated e.g. `"#positive#, cartoon style"`\
 **Numbers** can use expression e.g. `"#steps# + 10"`

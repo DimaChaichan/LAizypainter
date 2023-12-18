@@ -18,6 +18,7 @@ export function createAppState() {
 
     const loopStatus = signal<ELoopStatus>(ELoopStatus.stop);
 
+    let currentTaskFile = "";
     let task: any;
     const taskName = signal<string | undefined>(undefined);
     const taskValid = signal<boolean>(false);
@@ -34,6 +35,7 @@ export function createAppState() {
     const getHistoryImage = async (image: EImageComfy) => {
         return server.getHistoryImage(image)
     }
+
 
     const previewImageUrl = signal('')
     const previewImageBlob = signal<Blob | undefined>(undefined)
@@ -133,12 +135,6 @@ export function createAppState() {
         }
     }
 
-    // Force Rerender for Config
-    const reRenderTaskVariables = () => {
-        if (!taskVariablesFlat.value)
-            return
-        taskVariablesFlat.value = JSON.parse(JSON.stringify(taskVariablesFlat.value)); // Deep Copy
-    }
     const saveTaskVariablesLocal = () => {
         if (!taskVariables.value)
             return
@@ -147,8 +143,22 @@ export function createAppState() {
     const validTask = () => {
         server.validTask()
     }
+
+    const setTaskVariable = (name: string, value: any) => {
+        const newTaskVariablesFlat: any = {};
+        Object.keys(taskVariablesFlat.value).forEach((key) => {
+            newTaskVariablesFlat[key] = name === key ? value : taskVariablesFlat.value[key];
+        });
+        server.taskVariables = newTaskVariablesFlat;
+        taskVariablesFlat.value = newTaskVariablesFlat;
+        validTask();
+    }
+
     // TODO: Clean this Function, to much duplication, to noise
     const setTask = async (file: storage.File | undefined) => {
+        if (currentTaskFile === file?.nativePath)
+            return;
+
         if (file) {
             let data = JSON.parse((await file.read({format: storage.formats.utf8})).toString())
             if (!data.hasOwnProperty('prompt'))
@@ -197,6 +207,7 @@ export function createAppState() {
             previewImageUrl.value = '';
             server.taskConfig = taskConfig.value;
             server.taskVariables = taskVariablesFlat.value;
+            currentTaskFile = file.nativePath;
         } else {
             task = undefined;
             taskVariables.value = undefined;
@@ -228,13 +239,13 @@ export function createAppState() {
         taskProgress,
 
         taskName,
+        setTaskVariable,
         taskValid,
         taskConfig,
         taskVariables,
         taskVariablesFlat,
         saveTaskVariablesLocal,
         validTask,
-        reRenderTaskVariables,
         rerunTask,
         setTask,
         lastPrompt,

@@ -16,6 +16,7 @@ import {History} from "../components/history/history.comp.tsx";
 
 export function MainPanel() {
     const state = useContext(AppState);
+    const taskValid = state.taskValid;
     const serverUrl = useRef<HTMLInputElement>(null);
     const mainContainer = createRef();
 
@@ -46,7 +47,8 @@ export function MainPanel() {
             types: ['lzy'],
             createPersistentToken: false
         }).then(file => {
-            state.setTask(file).catch(error => app.showAlert(error))
+            if (file)
+                state.setTask(file).catch(error => app.showAlert(error))
         })
     };
 
@@ -174,9 +176,10 @@ export function MainPanel() {
                                                         style={{
                                                             margin: "0",
                                                             padding: "0"
-                                                        }}>Waiting for changes!
+                                                        }}>Waiting for
+                                                        changes! {!app.activeDocument ? " No Active Document!" : null}
                                                     </sp-label>
-                                                    {!state.taskValid.value ?
+                                                    {!taskValid.value ?
                                                         <>
                                                             <br/>
                                                             <sp-label

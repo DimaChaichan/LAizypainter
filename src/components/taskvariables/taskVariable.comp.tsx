@@ -20,42 +20,40 @@ export function TaskVariable(props: {
     // Helper
 
     const setVariable = (newValue: any, rerun: boolean, timer?: number) => {
-        state.taskVariablesFlat.value[props.name] = newValue;
+        state.setTaskVariable(props.name, newValue)
         if (rerun)
             state.rerunTask(timer);
         state.saveTaskVariablesLocal()
     }
 
     const checkComboMenuValue = (options: Array<string>, value: string) => {
-        if (!value)
-            return true;
-        return !options.some(option => option === value);
+        const option = options.some(option => option === value);
+        if (!option) {
+            state.taskVariablesFlat.value[props.name] = undefined;
+            setInvalid(true);
+        }
     }
+
+    // #######################################################
+    // Events
 
     const handleCheckboxChange = (event: any) => {
         setVariable(event.target.checked, true);
     };
     const handleTextInput = (event: any) => {
+        setVariable(event.target.value, true, 3000);
         if (props.variable.required) {
             setInvalid(!event.target.value);
-            state.validTask();
         }
-        setVariable(event.target.value, true, 3000);
     };
     const handleOnChangeComboBox = (option: string) => {
-        setInvalid(option === "");
-        state.validTask();
         setVariable(option, true);
+        setInvalid(option === "");
     };
 
-    // #######################################################
-    // Events
-
     const handleNumberInput = (changeValue: string | undefined) => {
-        setInvalid(!changeValue);
-        state.validTask();
         setVariable(changeValue, true, 2500);
-        state.reRenderTaskVariables();
+        setInvalid(!changeValue);
     };
 
     const handleSliderInput = (event: any) => {
@@ -65,8 +63,6 @@ export function TaskVariable(props: {
     const handleSeedRandomClick = () => {
         setVariable(randomSeed().toString(), true);
         setInvalid(false);
-        state.validTask();
-        state.reRenderTaskVariables();
     };
 
     switch (props.variable.type) {
@@ -148,7 +144,7 @@ export function TaskVariable(props: {
             </sp-slider>)
             break;
         case "model":
-            setInvalid(checkComboMenuValue(state.models.value.checkpoints, value));
+            checkComboMenuValue(state.models.value.checkpoints, value)
             comp = (<ComboBox options={state.models.value.checkpoints}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -156,7 +152,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "clip":
-            setInvalid(checkComboMenuValue(state.models.value.clip, value));
+            checkComboMenuValue(state.models.value.clip, value)
             comp = (<ComboBox options={state.models.value.clip}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -164,7 +160,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "clipVision":
-            setInvalid(checkComboMenuValue(state.models.value.clipVision, value));
+            checkComboMenuValue(state.models.value.clipVision, value);
             comp = (<ComboBox options={state.models.value.clipVision}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -172,7 +168,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "controlNet":
-            setInvalid(checkComboMenuValue(state.models.value.controlnet, value));
+            checkComboMenuValue(state.models.value.controlnet, value);
             comp = (<ComboBox options={state.models.value.controlnet}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -180,7 +176,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "diffusers":
-            setInvalid(checkComboMenuValue(state.models.value.diffusers, value));
+            checkComboMenuValue(state.models.value.diffusers, value);
             comp = (<ComboBox options={state.models.value.diffusers}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -188,7 +184,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "embeddings":
-            setInvalid(checkComboMenuValue(state.models.value.embeddings, value));
+            checkComboMenuValue(state.models.value.embeddings, value);
             comp = (<ComboBox options={state.models.value.embeddings}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -196,7 +192,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "gligen":
-            setInvalid(checkComboMenuValue(state.models.value.gligen, value));
+            checkComboMenuValue(state.models.value.gligen, value);
             comp = (<ComboBox options={state.models.value.gligen}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -204,7 +200,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "hypernetworks":
-            setInvalid(checkComboMenuValue(state.models.value.hypernetworks, value));
+            checkComboMenuValue(state.models.value.hypernetworks, value);
             comp = (<ComboBox options={state.models.value.hypernetworks}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -212,7 +208,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "lora":
-            setInvalid(checkComboMenuValue(state.models.value.loras, value));
+            checkComboMenuValue(state.models.value.loras, value);
             comp = (<ComboBox options={state.models.value.loras}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -220,7 +216,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "styleModels":
-            setInvalid(checkComboMenuValue(state.models.value.styleModels, value));
+            checkComboMenuValue(state.models.value.styleModels, value);
             comp = (<ComboBox options={state.models.value.styleModels}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -228,7 +224,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "upscaleModels":
-            setInvalid(checkComboMenuValue(state.models.value.upscaleModels, value));
+            checkComboMenuValue(state.models.value.upscaleModels, value);
             comp = (<ComboBox options={state.models.value.upscaleModels}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -236,7 +232,7 @@ export function TaskVariable(props: {
                               minMenuWidth={300}/>)
             break;
         case "vae":
-            setInvalid(checkComboMenuValue(state.models.value.vae, value));
+            checkComboMenuValue(state.models.value.vae, value);
             comp = (<ComboBox options={state.models.value.vae}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
@@ -247,7 +243,7 @@ export function TaskVariable(props: {
             let comboOptions: Array<string> = [];
             if (props.variable.hasOwnProperty("options"))
                 comboOptions = props.variable["options"]
-            setInvalid(checkComboMenuValue(comboOptions, value));
+            checkComboMenuValue(comboOptions, value);
             comp = (<ComboBox options={comboOptions}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
