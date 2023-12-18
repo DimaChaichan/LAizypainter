@@ -138,7 +138,7 @@ export function createAppState() {
     const saveTaskVariablesLocal = () => {
         if (!taskVariables.value)
             return
-        localStorage.setItem(`${taskVariables.value.name}_task`, JSON.stringify(taskVariablesFlat.value))
+        localStorage.setItem('localVariables', JSON.stringify(taskVariablesFlat.value))
     }
     const validTask = () => {
         server.validTask()
@@ -186,14 +186,15 @@ export function createAppState() {
                 }
                 taskVariables.value = data.variables;
 
-                // const localVariableString = localStorage.getItem(`${taskVariables.value.name}_task`)
-                // if (localVariableString) {
-                //     const localVariable = JSON.parse(localVariableString);
-                //     Object.keys(localVariable).map(key => {
-                //         if (variables.hasOwnProperty(key) && variables[key] !== "random")
-                //             variables[key] = localVariable[key]
-                //     })
-                // }
+                const localVariableString = localStorage.getItem('localVariables')
+                if (localVariableString) {
+                    const localVariable = JSON.parse(localVariableString);
+                    console.log(localVariable)
+                    Object.keys(localVariable).map(key => {
+                        variables[key] = localVariable[key]
+                    })
+                    console.log(variables)
+                }
                 taskVariablesFlat.value = variables
             } else {
                 taskVariables.value = undefined;
