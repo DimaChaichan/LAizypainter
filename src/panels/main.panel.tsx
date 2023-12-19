@@ -87,7 +87,8 @@ export function MainPanel() {
                     <div style={{
                         width: "100%",
                         display: "flex",
-                        padding: "10px 5px"
+                        padding: "10px 5px",
+                        minHeight: "58px"
                     }}>
                         {state.taskName.value ?
                             <>

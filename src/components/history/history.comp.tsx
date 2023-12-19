@@ -14,7 +14,6 @@ export function History() {
     const handleLoadMoreClick = async () => {
         setLoadingIndex(loadingIndex + loadingBatchCount);
     };
-    console.log(state.history.value, state.history.value.length, loadingIndex, loadingBatchCount)
     return (
         <div style={{
             padding: "5px"
