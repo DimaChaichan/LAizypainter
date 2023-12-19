@@ -14,6 +14,7 @@ export function History() {
     const handleLoadMoreClick = async () => {
         setLoadingIndex(loadingIndex + loadingBatchCount);
     };
+    console.log(state.history.value, state.history.value.length, loadingIndex, loadingBatchCount)
     return (
         <div style={{
             padding: "5px"
@@ -34,6 +35,8 @@ export function History() {
                                 return (<>
                                     {outputsNodes.map(node => {
                                         return session.outputs[node].images.map((image: any) => {
+                                            if(image.type !== "output")
+                                                return null
                                             if (loadingCounter >= loadingIndex + loadingBatchCount)
                                                 return null;
                                             loadingCounter++;
@@ -57,7 +60,14 @@ export function History() {
                                             </sp-action-button>
                                         </div>
                                         :
-                                        null
+                                        <div style={{
+                                            width: "100%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center"
+                                        }}>
+                                            <sp-body size="XS">No History exist!</sp-body>
+                                        </div>
                                     }
                                 </>
                                 :

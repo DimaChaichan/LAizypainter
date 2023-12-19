@@ -23,6 +23,10 @@ export default defineConfig({
                 {
                     src: 'plugin/*',
                     dest: ''
+                },
+                {
+                    src: 'src/assets/*',
+                    dest: 'assets'
                 }
             ]
         }),
