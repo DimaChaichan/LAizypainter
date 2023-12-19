@@ -85,30 +85,59 @@ export async function createFileInDataFolder(name: string) {
 }
 
 /**
+ * Find a value in a Object recursive
+ * @param object
+ * @param value
+ */
+export function findVal(object: any, value: any): any {
+    const keys = Object.keys(object);
+    let found = false;
+    for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        if (object[k] && typeof object[k] === 'object') {
+            const check = findVal(object[k], value);
+            if (check) found = true;
+        }
+        if (typeof object[k] !== "string")
+            continue
+        if (object[k].includes(value)) {
+            found = true
+        }
+    }
+
+    return found;
+}
+
+/**
  * Find a value in an Object recursive and replace this.
  * @param object
  * @param value
  * @param replace
  */
 export function findValAndReplace(object: any, value: any, replace: any): any {
+    const keys = Object.keys(object);
     let found = false;
-    Object.keys(object).map(function (k) {
+    for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
         if (object[k] && typeof object[k] === 'object') {
-            return findValAndReplace(object[k], value, replace);
+            const check = findValAndReplace(object[k], value, replace);
+            if (check) found = true;
         }
         if (typeof object[k] !== "string")
-            return;
+            continue
         if (object[k].includes(value)) {
             found = true
-            object[k] = object[k].replace(value, replace);
-            if (typeof replace === "number") {
-                const mexp = new Mexp();
-                // @ts-ignore
-                object[k] = mexp.eval(object[k]);
+            if (replace) {
+                object[k] = object[k].replace(value, replace);
+                if (typeof replace === "number") {
+                    const mexp = new Mexp();
+                    // @ts-ignore
+                    object[k] = mexp.eval(object[k]);
+                }
             }
-            return;
         }
-    });
+    }
+
     return found;
 }
 

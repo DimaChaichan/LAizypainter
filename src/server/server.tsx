@@ -1,7 +1,7 @@
 import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
 import {app, core, imaging} from "photoshop";
 import {
-    createFileInDataFolder,
+    createFileInDataFolder, findVal,
     findValAndReplace,
     map,
     randomSeed,
@@ -363,29 +363,31 @@ export class Server {
                 sameImage = true;
             } else {
                 self.lastHistoryLength = app.activeDocument.historyStates.length;
-                const pixelData = await imaging.getPixels({targetSize: size, applyAlpha: true});
-                self.setTaskStatus(ETaskStatus.pending)
+                if (findVal(this.task, '#image#')) {
+                    const pixelData = await imaging.getPixels({targetSize: size, applyAlpha: true});
+                    self.setTaskStatus(ETaskStatus.pending)
 
-                let jpegData = await imaging.encodeImageData({"imageData": pixelData.imageData, "base64": false});
-                await pixelData.imageData.dispose();
-                const tmpFile = await createFileInDataFolder(self.getImageName())
-                // @ts-ignore
-                await tmpFile.write(jpegData)
+                    let jpegData = await imaging.encodeImageData({"imageData": pixelData.imageData, "base64": false});
+                    await pixelData.imageData.dispose();
+                    const tmpFile = await createFileInDataFolder(self.getImageName())
+                    // @ts-ignore
+                    await tmpFile.write(jpegData)
 
-                const body = new FormData();
-                body.append("overwrite", "true");
-                // @ts-ignore
-                body.append("image", tmpFile);
+                    const body = new FormData();
+                    body.append("overwrite", "true");
+                    // @ts-ignore
+                    body.append("image", tmpFile);
 
-                const responseUpload = await self.fetch('/upload/image', {
-                    method: 'POST',
-                    body: body,
-                })
-                if (!responseUpload)
-                    return
-                if (responseUpload.status !== 200) {
-                    self.stopLoop();
-                    throw `[ERROR] Upload Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
+                    const responseUpload = await self.fetch('/upload/image', {
+                        method: 'POST',
+                        body: body,
+                    })
+                    if (!responseUpload)
+                        return
+                    if (responseUpload.status !== 200) {
+                        self.stopLoop();
+                        throw `[ERROR] Upload Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
+                    }
                 }
 
                 const promptText = self.createPromptTask();
