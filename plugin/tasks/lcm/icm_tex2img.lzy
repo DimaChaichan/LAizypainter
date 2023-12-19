@@ -1,7 +1,8 @@
 {
   "config": {
-    "label": "LCM IMG2IMG",
-    "uploadSize": 1024
+    "label": "TEX2IMG",
+    "uploadSize": 1024,
+    "mode": "single"
   },
   "variables": {
     "positive": {
@@ -14,27 +15,20 @@
       "value": "text, watermark",
       "label": "Negative Prompt:"
     },
-    "denoise": {
-      "type": "slider",
-      "value": 0.8,
-      "min": 0.01,
-      "max": 1,
-      "step": 0.01,
-      "mapMax": 1,
-      "label": "AI Freedom (Denoise):"
-    },
     "advanced": {
       "row1": {
         "type": "row",
         "seed": {
           "type": "seed",
           "value": "random",
-          "label": "Seed:"
+          "label": "Seed:",
+          "restore": false
         },
         "steps": {
           "type": "number",
           "value": 5,
-          "label": "Steps:"
+          "label": "Steps:",
+          "restore": false
         }
       },
       "row2": {
@@ -42,7 +36,8 @@
         "cfg": {
           "type": "number",
           "value": 1.3,
-          "label": "CFG:"
+          "label": "CFG:",
+          "restore": false
         },
         "sampler": {
           "type": "combo",
@@ -68,7 +63,8 @@
             "ddpm",
             "lcm"
           ],
-          "label": "Sampler:"
+          "label": "Sampler:",
+          "restore": false
         },
         "scheduler": {
           "type": "combo",
@@ -81,7 +77,8 @@
             "simple",
             "ddim_uniform"
           ],
-          "label": "scheduler:"
+          "label": "scheduler:",
+          "restore": false
         }
       },
       "row3": {
@@ -107,9 +104,9 @@
         "cfg": "#cfg#",
         "sampler_name": "#sampler#",
         "scheduler": "#scheduler#",
-        "denoise": "#denoise#",
+        "denoise": 1,
         "model": [
-          "17",
+          "11",
           0
         ],
         "positive": [
@@ -121,17 +118,31 @@
           0
         ],
         "latent_image": [
-          "20",
+          "5",
           0
         ]
       },
       "class_type": "KSampler"
     },
+    "4": {
+      "inputs": {
+        "ckpt_name": "#model#"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
+    "5": {
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage"
+    },
     "6": {
       "inputs": {
         "text": "#positive#",
         "clip": [
-          "16",
+          "11",
           1
         ]
       },
@@ -141,7 +152,7 @@
       "inputs": {
         "text": "#negative#",
         "clip": [
-          "16",
+          "11",
           1
         ]
       },
@@ -154,7 +165,7 @@
           0
         ],
         "vae": [
-          "16",
+          "4",
           2
         ]
       },
@@ -170,47 +181,21 @@
       },
       "class_type": "SaveImage"
     },
-    "16": {
-      "inputs": {
-        "ckpt_name": "#model#"
-      },
-      "class_type": "CheckpointLoaderSimple"
-    },
-    "17": {
+    "11": {
       "inputs": {
         "lora_name": "#lora#",
         "strength_model": 1,
         "strength_clip": 1,
         "model": [
-          "16",
+          "4",
           0
         ],
         "clip": [
-          "16",
+          "4",
           1
         ]
       },
       "class_type": "LoraLoader"
-    },
-    "18": {
-      "inputs": {
-        "image": "#image#",
-        "choose file to upload": "image"
-      },
-      "class_type": "LoadImage"
-    },
-    "20": {
-      "inputs": {
-        "pixels": [
-          "18",
-          0
-        ],
-        "vae": [
-          "16",
-          2
-        ]
-      },
-      "class_type": "VAEEncode"
     }
   }
 }

@@ -29,7 +29,7 @@ export function TaskVariable(props: {
     const checkComboMenuValue = (options: Array<string>, value: string) => {
         const option = options.some(option => option === value);
         if (!option) {
-            state.taskVariablesFlat.value[props.name] = undefined;
+            state.taskVariablesFlat.value[props.name].value = undefined;
             setInvalid(true);
         }
     }
@@ -67,11 +67,11 @@ export function TaskVariable(props: {
 
     switch (props.variable.type) {
         case "bool":
-            if (typeof value !== "boolean") {
-                value = false;
+            if (typeof value.value !== "boolean") {
+                value.value = false;
             }
             comp = (<sp-checkbox
-                checked={value ? value : false}
+                checked={value ? value.value : false}
                 onChange={handleCheckboxChange}
                 style={{width: "100%"}}>
                 {props.label}
@@ -79,7 +79,7 @@ export function TaskVariable(props: {
             break;
         case "text":
             comp = (<sp-textfield
-                value={value ? value.toString() : ""}
+                value={value ? value.value.toString() : ""}
                 onInput={handleTextInput}
                 style={{width: "100%"}}>
                 <sp-label slot="label"
@@ -89,7 +89,7 @@ export function TaskVariable(props: {
             break;
         case "textarea":
             comp = (<sp-textarea onInput={handleTextInput}
-                                 value={value ? value.toString() : ""}
+                                 value={value ? value.value.toString() : ""}
                                  style={{width: "100%"}}>
                 <sp-label slot="label"
                           className="theme-text">{props.label}
@@ -104,7 +104,7 @@ export function TaskVariable(props: {
                     max={props.variable?.max}
                     label={props.label}
                     style={{width: "100%"}}
-                    value={value}
+                    value={value.value}
                     onInput={handleNumberInput}/>)
             break;
         case "number":
@@ -115,20 +115,20 @@ export function TaskVariable(props: {
                     step={props.variable?.step}
                     label={props.label}
                     style={{width: "100%"}}
-                    value={value}
+                    value={value.value}
                     onInput={handleNumberInput}/>)
             break;
         case "seed":
-            if (value === "random") {
-                state.taskVariablesFlat.value[props.name] = randomSeed().toString();
-                value = state.taskVariablesFlat.value[props.name];
+            if (value.value === "random") {
+                state.taskVariablesFlat.value[props.name].value = randomSeed().toString();
+                value.value = state.taskVariablesFlat.value[props.name].value;
             }
             comp = (
                 <SeedField
                     max={props.variable?.max}
                     label={props.label}
                     style={{width: "100%"}}
-                    value={value}
+                    value={value.value}
                     onInput={handleNumberInput}
                     onRandomClick={handleSeedRandomClick}/>)
             break;
@@ -138,116 +138,116 @@ export function TaskVariable(props: {
                 min={props.variable.min ? props.variable.min : 0}
                 max={props.variable.max ? props.variable.max : 100}
                 step={props.variable.step ? props.variable.step : 1}
-                value={value ? value : 0}
+                value={value ? value.value : 0}
                 style={{width: "100%", padding: "0px 5px"}}>
                 <sp-label slot="label">{props.label}</sp-label>
             </sp-slider>)
             break;
         case "model":
-            checkComboMenuValue(state.models.value.checkpoints, value)
+            checkComboMenuValue(state.models.value.checkpoints, value.value)
             comp = (<ComboBox options={state.models.value.checkpoints}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "clip":
-            checkComboMenuValue(state.models.value.clip, value)
+            checkComboMenuValue(state.models.value.clip, value.value)
             comp = (<ComboBox options={state.models.value.clip}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "clipVision":
-            checkComboMenuValue(state.models.value.clipVision, value);
+            checkComboMenuValue(state.models.value.clipVision, value.value);
             comp = (<ComboBox options={state.models.value.clipVision}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "controlNet":
-            checkComboMenuValue(state.models.value.controlnet, value);
+            checkComboMenuValue(state.models.value.controlnet, value.value);
             comp = (<ComboBox options={state.models.value.controlnet}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "diffusers":
-            checkComboMenuValue(state.models.value.diffusers, value);
+            checkComboMenuValue(state.models.value.diffusers, value.value);
             comp = (<ComboBox options={state.models.value.diffusers}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "embeddings":
-            checkComboMenuValue(state.models.value.embeddings, value);
+            checkComboMenuValue(state.models.value.embeddings, value.value);
             comp = (<ComboBox options={state.models.value.embeddings}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "gligen":
-            checkComboMenuValue(state.models.value.gligen, value);
+            checkComboMenuValue(state.models.value.gligen, value.value);
             comp = (<ComboBox options={state.models.value.gligen}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "hypernetworks":
-            checkComboMenuValue(state.models.value.hypernetworks, value);
+            checkComboMenuValue(state.models.value.hypernetworks, value.value);
             comp = (<ComboBox options={state.models.value.hypernetworks}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "lora":
-            checkComboMenuValue(state.models.value.loras, value);
+            checkComboMenuValue(state.models.value.loras, value.value);
             comp = (<ComboBox options={state.models.value.loras}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "styleModels":
-            checkComboMenuValue(state.models.value.styleModels, value);
+            checkComboMenuValue(state.models.value.styleModels, value.value);
             comp = (<ComboBox options={state.models.value.styleModels}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "upscaleModels":
-            checkComboMenuValue(state.models.value.upscaleModels, value);
+            checkComboMenuValue(state.models.value.upscaleModels, value.value);
             comp = (<ComboBox options={state.models.value.upscaleModels}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "vae":
-            checkComboMenuValue(state.models.value.vae, value);
+            checkComboMenuValue(state.models.value.vae, value.value);
             comp = (<ComboBox options={state.models.value.vae}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "combo":
             let comboOptions: Array<string> = [];
             if (props.variable.hasOwnProperty("options"))
                 comboOptions = props.variable["options"]
-            checkComboMenuValue(comboOptions, value);
+            checkComboMenuValue(comboOptions, value.value);
             comp = (<ComboBox options={comboOptions}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
-                              value={value}
+                              value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "row":

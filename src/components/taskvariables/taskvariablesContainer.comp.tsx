@@ -28,7 +28,7 @@ export function TaskvariablesContainer() {
         const keys = Object.keys(advancedOptionsFlat);
 
         for (let i = 0; i < keys.length; i++) {
-            const variable = state.taskVariablesFlat.value[keys[i]];
+            const variable = state.taskVariablesFlat.value[keys[i]].value;
             if (variable === undefined ||
                 variable === null ||
                 (typeof variable === "number" && isNaN(variable))) {

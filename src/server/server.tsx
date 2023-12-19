@@ -363,6 +363,11 @@ export class Server {
                 sameImage = true;
             } else {
                 self.lastHistoryLength = app.activeDocument.historyStates.length;
+
+                const promptText = self.createPromptTask();
+                if (!promptText)
+                    return
+
                 if (findVal(this.task, '#image#')) {
                     const pixelData = await imaging.getPixels({targetSize: size, applyAlpha: true});
                     self.setTaskStatus(ETaskStatus.pending)
@@ -390,9 +395,6 @@ export class Server {
                     }
                 }
 
-                const promptText = self.createPromptTask();
-                if (!promptText)
-                    return
                 self.executingNodes = promptText.prompt;
                 self.executingNodesCount = 0;
                 self.emitEvent(EServerEventTypes.sendPrompt, JSON.stringify(promptText, null, 4))
@@ -593,7 +595,8 @@ export class Server {
         taskCopy.client_id = this.clientId;
         if (this.taskVariables) {
             Object.keys(this.taskVariables).map(key => {
-                const value = this.taskVariables[key] === -1 || this.taskVariables[key] === "-1" ? randomSeed() : this.taskVariables[key];
+                const variable = this.taskVariables[key];
+                const value = variable.value === -1 || variable.value === "-1" ? randomSeed() : variable.value;
                 findValAndReplace(taskCopy, `#${key}#`, value)
             })
         }

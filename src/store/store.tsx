@@ -131,11 +131,9 @@ export function createAppState() {
         if (timer) {
             rerunTimer = setTimeout(() => {
                 server.lastHistoryLength = -1;
-                server.taskVariables = taskVariablesFlat.value;
             }, timer)
         } else {
             server.lastHistoryLength = -1;
-            server.taskVariables = taskVariablesFlat.value;
         }
     }
 
@@ -151,7 +149,10 @@ export function createAppState() {
     const setTaskVariable = (name: string, value: any) => {
         const newTaskVariablesFlat: any = {};
         Object.keys(taskVariablesFlat.value).forEach((key) => {
-            newTaskVariablesFlat[key] = name === key ? value : taskVariablesFlat.value[key];
+            let currentValue = JSON.parse(JSON.stringify(taskVariablesFlat.value[key])); // Deep Copy
+            if (name === key)
+                currentValue.value = value
+            newTaskVariablesFlat[key] = currentValue;
         });
         server.taskVariables = newTaskVariablesFlat;
         taskVariablesFlat.value = newTaskVariablesFlat;
@@ -194,9 +195,15 @@ export function createAppState() {
                 if (localVariableString) {
                     const localVariable = JSON.parse(localVariableString);
                     Object.keys(localVariable).map(key => {
-                        variables[key] = localVariable[key]
+                        if (variables.hasOwnProperty(key) &&
+                            variables[key].hasOwnProperty("config") &&
+                            variables[key].value !== "random" &&
+                            variables[key].config.hasOwnProperty("restore") &&
+                            variables[key].config.restore)
+                            variables[key].value = localVariable[key].value
                     })
                 }
+                console.log(variables)
                 taskVariablesFlat.value = variables
             } else {
                 taskVariables.value = undefined;

@@ -230,9 +230,16 @@ export function flatTaskConfig(name: string, variable: ITaskVariable | any, obj:
                 })
             break;
         default:
+            if (name === "image")
+                throw new Error(`[ERROR] You cant use the Variable name image!`);
             if (obj[name])
                 throw new Error(`[ERROR] Config with the name: ${name} exist multiple times!`);
-            obj[name] = variable.value
+            obj[name] = {
+                value: variable.value, config: {
+                    restore: variable.hasOwnProperty('restore') ? variable["restore"] : true
+                }
+            }
+            console.log("variable",  obj[name])
             break;
     }
 }
