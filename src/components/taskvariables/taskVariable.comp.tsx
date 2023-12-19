@@ -4,6 +4,7 @@ import {randomSeed} from "../../utils.tsx";
 import {NumberField} from "../numberField/numberField.comp.tsx";
 import {SeedField} from "../seedInput/seedInput.comp.tsx";
 import {ComboBox} from "../comboBox/comboBox.comp.tsx";
+import {LayerField} from "../layerField/layerField.tsx";
 
 export function TaskVariable(props: {
     variable: ITaskVariable | any,
@@ -250,6 +251,10 @@ export function TaskVariable(props: {
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
+        case "layer":
+            comp = (<LayerField label={props.label}
+                                value={value.value}/>)
+            break
         case "row":
             comp = (
                 <div style={{display: "flex", width: "100%"}}>
