@@ -8,7 +8,7 @@ export function TaskvariablesContainer() {
     const state = useContext(AppState);
     const taskValid = state.taskValid;
     let advancedOptions = [];
-    if (state.taskVariables.value.hasOwnProperty("advanced")) {
+    if (state.taskVariables.value && state.taskVariables.value.hasOwnProperty("advanced")) {
         advancedOptions = Object.keys(state.taskVariables.value["advanced"]).map(key => {
             const variable = state.taskVariables.value["advanced"][key];
             variable.key = key;

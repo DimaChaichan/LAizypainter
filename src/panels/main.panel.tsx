@@ -153,14 +153,29 @@ export function MainPanel() {
                                             </sp-button> :
                                             null}
                                         {state.taskStatus.value === ETaskStatus.run ?
-                                            <sp-progressbar
-                                                style={{
-                                                    width: "100%",
-                                                    padding: "0 15px"
-                                                }}
-                                                max={1} value={state.taskProgress.value}>
-                                                <sp-label slot="label">Task {state.taskName.value} running...</sp-label>
-                                            </sp-progressbar>
+                                            <div style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                width: "100%"
+                                            }}>
+                                                <sp-progressbar
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: "0 15px"
+                                                    }}
+                                                    max={1} value={state.taskProgress.value}>
+                                                    <sp-label slot="label">Task {state.taskName.value} running...
+                                                    </sp-label>
+                                                </sp-progressbar>
+                                                <sp-progressbar
+                                                    size="small"
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: "3px 15px 0 15px"
+                                                    }}
+                                                    max={1} value={state.nodeProgress.value}>
+                                                </sp-progressbar>
+                                            </div>
                                             : state.taskStatus.value === ETaskStatus.pending ?
                                                 <sp-label style={{
                                                     width: "100%",

@@ -116,7 +116,14 @@ export function ComboBox(props: {
                             <div className="theme-border theme-background-textfield"
                                  style={{height: "32px"}}
                                  onClick={handleOnclickOpenCloseBtn}>
-                                <sp-body style={{paddingLeft: "10px", paddingTop: "2px", fontSize: "14px"}}
+                                <sp-body style={{
+                                    paddingLeft: "10px",
+                                    paddingTop: "2px",
+                                    fontSize: "14px",
+                                    overflow: "hidden",
+                                    whiteSpace: "nowrap",
+                                    textOverflow: "ellipsis"
+                                }}
                                          size="M" className="theme-text">{value}</sp-body>
                             </div>
                         </div>

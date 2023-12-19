@@ -1,6 +1,12 @@
 import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
 import {app, core, imaging} from "photoshop";
-import {createFileInDataFolder, findValAndReplace, map, randomSeed, serializeImageComfyData} from "../utils.tsx";
+import {
+    createFileInDataFolder,
+    findValAndReplace,
+    map,
+    randomSeed,
+    serializeImageComfyData
+} from "../utils.tsx";
 
 /**
  * Websocket server to communicate with ComfyUI Server (https://github.com/comfyanonymous/ComfyUI)
@@ -29,6 +35,8 @@ export class Server {
 
     imageName = 'upload';
     lastHistoryLength = -1;
+    executingNodes: any = [];
+    executingNodesCount = 0;
 
     timer: any;
     timerWait = 2000;
@@ -153,10 +161,18 @@ export class Server {
                             break;
                         case "progress":
                             const value = map(data.data.value, 0, data.data.max, 0, 1);
-                            self.emitEvent(EServerEventTypes.changeTaskProgress, value)
+                            self.emitEvent(EServerEventTypes.changeNodeProgress, value)
                             break;
                         case "executing":
                             self.executingNodeId = data.data.node;
+                            if (data.data.prompt_id !== self.promptId)
+                                return
+                            if (self.executingNodeId && self.executingNodes.hasOwnProperty(self.executingNodeId)) {
+                                self.executingNodesCount++;
+                                const taskProgress =
+                                    map(self.executingNodesCount, 0, Object.keys(self.executingNodes).length, 0, 1)
+                                self.emitEvent(EServerEventTypes.changeTaskProgress, taskProgress)
+                            }
                             if (self.executingNodeId && self.taskStatus !== ETaskStatus.stopping) {
                                 self.setTaskStatus(ETaskStatus.run)
                             }
@@ -171,6 +187,7 @@ export class Server {
                             break;
                         case "execution_cached":
                             if (self.taskStatus === ETaskStatus.pending) {
+                                self.emitEvent(EServerEventTypes.changeNodeProgress, 0)
                                 self.emitEvent(EServerEventTypes.changeTaskProgress, 0)
                                 self.setTaskStatus(ETaskStatus.run)
                             }
@@ -374,7 +391,11 @@ export class Server {
                 const promptText = self.createPromptTask();
                 if (!promptText)
                     return
+                self.executingNodes = promptText.prompt;
+                self.executingNodesCount = 0;
                 self.emitEvent(EServerEventTypes.sendPrompt, JSON.stringify(promptText, null, 4))
+                self.emitEvent(EServerEventTypes.changeNodeProgress, 0)
+                self.emitEvent(EServerEventTypes.changeTaskProgress, 0)
                 const responsePrompt = await self.fetch('/prompt', {
                     method: 'POST',
                     headers: {
@@ -392,7 +413,7 @@ export class Server {
                 self.promptId = responseData.prompt_id;
             }
         }, {"commandName": 'Send Prompt'});
-        console.log("aa", sameImage)
+
         if (sameImage) {
             self.runLoopTask();
         }
@@ -520,6 +541,7 @@ export class Server {
         const imageData = await responseImage.arrayBuffer();
         const imageBlob = new Blob([imageData], {type: "image/png"});
         self.emitEvent(EServerEventTypes.previewImage, imageBlob)
+        self.emitEvent(EServerEventTypes.changeTaskProgress, 1)
     }
 
     async getHistoryImage(image: EImageComfy) {
@@ -589,6 +611,7 @@ export enum EServerEventTypes {
     "addHistory",
     "changeStatus",
     "changeTaskStatus",
+    "changeNodeProgress",
     "changeTaskProgress",
     "changeLoopStatus",
     "error",

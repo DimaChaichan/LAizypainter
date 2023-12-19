@@ -29,6 +29,7 @@ export function createAppState() {
     const taskVariables = signal<any>(undefined);
     const taskVariablesFlat = signal<any>({});
     const taskStatus = signal<ETaskStatus>(ETaskStatus.stop);
+    const nodeProgress = signal(0);
     const taskProgress = signal(0);
 
     const history = signal<any>([])
@@ -62,6 +63,9 @@ export function createAppState() {
     })
     server.on(EServerEventTypes.changeTaskStatus, (data) => {
         taskStatus.value = data;
+    })
+    server.on(EServerEventTypes.changeNodeProgress, (data) => {
+        nodeProgress.value = data;
     })
     server.on(EServerEventTypes.changeTaskProgress, (data) => {
         taskProgress.value = data;
@@ -189,16 +193,14 @@ export function createAppState() {
                 const localVariableString = localStorage.getItem('localVariables')
                 if (localVariableString) {
                     const localVariable = JSON.parse(localVariableString);
-                    console.log(localVariable)
                     Object.keys(localVariable).map(key => {
                         variables[key] = localVariable[key]
                     })
-                    console.log(variables)
                 }
                 taskVariablesFlat.value = variables
             } else {
                 taskVariables.value = undefined;
-                taskVariablesFlat.value = undefined;
+                taskVariablesFlat.value = {};
             }
 
             task = data;
@@ -236,6 +238,7 @@ export function createAppState() {
         serverStatus,
         loopStatus,
         taskStatus,
+        nodeProgress,
         taskProgress,
 
         taskName,
