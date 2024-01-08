@@ -57,12 +57,10 @@ The config area has some settings for the Task.
 ``` Json
   "config": {
     "label": "Img2Img",
-    "uploadSize": 1024,
     "mode": "loop"
   },
 ```
 **label:** Set the label for the Task, default: Filename \
-**uploadSize:** means the largest side of the upload image, default: Document size\
 **mode:** The mode for the task. Currently there is "single" or "loop". In loop mode, the plugin waits for changes and
 executes the task again and again. default: loop.
 

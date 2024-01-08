@@ -1,7 +1,6 @@
 {
   "config": {
     "label": "TEX2IMG",
-    "uploadSize": 1024,
     "mode": "single"
   },
   "variables": {

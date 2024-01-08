@@ -1,6 +1,6 @@
 {
   "config": {
-    "uploadSize": 1024,
+    "label": "IMG2IMG With LORA",
     "mode": "loop"
   },
   "variables": {

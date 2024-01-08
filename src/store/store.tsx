@@ -23,8 +23,7 @@ export function createAppState() {
     const taskName = signal<string | undefined>(undefined);
     const taskValid = signal<boolean>(false);
     const taskConfig = signal<ETaskConfig>({
-        mode: "loop",
-        uploadSize: 512
+        mode: "loop"
     });
     const taskVariables = signal<any>(undefined);
     const taskVariablesFlat = signal<any>({});
@@ -129,18 +128,24 @@ export function createAppState() {
             clearTimeout(rerunTimer)
 
         if (timer) {
-            rerunTimer = setTimeout(() => {
-                server.lastHistoryLength = -1;
+            rerunTimer = window.setTimeout(() => {
+                server.lastHistoryID = -1;
             }, timer)
         } else {
-            server.lastHistoryLength = -1;
+            server.lastHistoryID = -1;
         }
     }
 
     const saveTaskVariablesLocal = () => {
         if (!taskVariables.value)
             return
-        localStorage.setItem('localVariables', JSON.stringify(taskVariablesFlat.value))
+        let toSave: any = {};
+        Object.keys(taskVariablesFlat.value).forEach(function (key) {
+            const value = taskVariablesFlat.value[key];
+            if (value.hasOwnProperty('value') && typeof value.value !== "object")
+                toSave[key] = taskVariablesFlat.value[key]
+        });
+        localStorage.setItem('localVariables', JSON.stringify(toSave))
     }
     const validTask = () => {
         server.validTask()
@@ -173,11 +178,10 @@ export function createAppState() {
 
             if (data.hasOwnProperty('config')) {
                 taskConfig.value = {
-                    mode: data.config.mode ? data.config.mode : 'loop',
-                    uploadSize: data.config.uploadSize ? data.config.uploadSize : undefined
+                    mode: data.config.mode ? data.config.mode : 'loop'
                 }
             } else {
-                taskConfig.value = {mode: "loop", uploadSize: undefined};
+                taskConfig.value = {mode: "loop"};
             }
             if (data.hasOwnProperty('variables')) {
                 let variables: any = {};
@@ -203,7 +207,6 @@ export function createAppState() {
                             variables[key].value = localVariable[key].value
                     })
                 }
-                console.log(variables)
                 taskVariablesFlat.value = variables
             } else {
                 taskVariables.value = undefined;
@@ -223,9 +226,10 @@ export function createAppState() {
             taskVariablesFlat.value = undefined;
             server.task = task;
             taskName.value = undefined;
-            server.taskConfig = {mode: "loop", uploadSize: undefined};
+            server.taskConfig = {mode: "loop"};
             server.taskVariables = undefined;
             previewImageUrl.value = '';
+            currentTaskFile = '';
         }
         server.validTask();
     }
@@ -295,7 +299,6 @@ export interface EImageComfy {
 
 export interface ETaskConfig {
     mode: "single" | "loop"
-    uploadSize: number | undefined
 }
 
 export enum EServerStatus {

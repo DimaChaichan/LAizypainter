@@ -1,11 +1,10 @@
 {
   "config": {
     "label": "Upscale",
-    "uploadSize": 1024,
     "mode": "single"
   },
   "variables": {
-    "model": {
+    "upscaleModel": {
       "type": "upscaleModels",
       "value": "realesrganX4plus_v1.pt",
       "label": "Upscale Model:"
@@ -24,7 +23,7 @@
     },
     "13": {
       "inputs": {
-        "model_name": "#model#"
+        "model_name": "#upscaleModel#"
       },
       "class_type": "UpscaleModelLoader"
     },

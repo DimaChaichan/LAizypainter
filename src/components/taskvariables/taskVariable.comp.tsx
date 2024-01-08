@@ -3,8 +3,9 @@ import {AppState} from "../../main.tsx";
 import {randomSeed} from "../../utils.tsx";
 import {NumberField} from "../numberField/numberField.comp.tsx";
 import {SeedField} from "../seedInput/seedInput.comp.tsx";
-import {ComboBox} from "../comboBox/comboBox.comp.tsx";
 import {LayerField} from "../layerField/layerField.tsx";
+import {Layer} from "photoshop/dom/Layer";
+import ComboBox from "../comboBox/comboBox.comp.tsx";
 
 export function TaskVariable(props: {
     variable: ITaskVariable | any,
@@ -20,11 +21,17 @@ export function TaskVariable(props: {
     // #######################################################
     // Helper
 
-    const setVariable = (newValue: any, rerun: boolean, timer?: number) => {
+    const setVariable = (newValue: any, rerun: boolean, timer?: number, autoSave?: boolean) => {
         state.setTaskVariable(props.name, newValue)
         if (rerun)
             state.rerunTask(timer);
-        state.saveTaskVariablesLocal()
+        if (autoSave || autoSave === undefined)
+            state.saveTaskVariablesLocal()
+    }
+
+    const checkValue = (value: any) => {
+        if (!value)
+            setInvalid(true);
     }
 
     const checkComboMenuValue = (options: Array<string>, value: string) => {
@@ -51,6 +58,10 @@ export function TaskVariable(props: {
         setVariable(option, true);
         setInvalid(option === "");
     };
+    const handleOnChangeLayerField = (layer: Layer) => {
+        setVariable(layer, true, undefined, false);
+        setInvalid(false);
+    };
 
     const handleNumberInput = (changeValue: string | undefined) => {
         setVariable(changeValue, true, 2500);
@@ -66,6 +77,16 @@ export function TaskVariable(props: {
         setInvalid(false);
     };
 
+    const restoreIcon = props.variable.hasOwnProperty('restore') && !props.variable.restore ? null : (
+        <div slot="icon" style="fill: currentcolor;transform: translateY(1px);padding-right: 1px;">
+            <svg height="12" viewBox="0 0 18 18" width="12">
+                <rect id="Canvas" fill="#ff13dc" opacity="0" width="18" height="18"/>
+                <rect className="fill" height="3" width="2" x="10" y="2"/>
+                <path className="fill"
+                      d="M15.854,4.1465s-2.0075-2-2.073-2.057A.48449.48449,0,0,0,13.5,2H13V6H7V2H2.5a.5.5,0,0,0-.5.5v13a.5.5,0,0,0,.5.5h13a.5.5,0,0,0,.5-.5V4.5A.5.5,0,0,0,15.854,4.1465ZM13,15H5V8h8Z"/>
+            </svg>
+        </div>)
+
     switch (props.variable.type) {
         case "bool":
             if (typeof value.value !== "boolean") {
@@ -75,7 +96,9 @@ export function TaskVariable(props: {
                 checked={value ? value.value : false}
                 onChange={handleCheckboxChange}
                 style={{width: "100%"}}>
-                {props.label}
+                <sp-label>
+                    {restoreIcon}
+                    {props.label}</sp-label>
             </sp-checkbox>)
             break;
         case "text":
@@ -84,7 +107,8 @@ export function TaskVariable(props: {
                 onInput={handleTextInput}
                 style={{width: "100%"}}>
                 <sp-label slot="label"
-                          className="theme-text">{props.label}
+                          className="theme-text">
+                    {restoreIcon}{props.label}
                 </sp-label>
             </sp-textfield>)
             break;
@@ -93,28 +117,32 @@ export function TaskVariable(props: {
                                  value={value ? value.value.toString() : ""}
                                  style={{width: "100%"}}>
                 <sp-label slot="label"
-                          className="theme-text">{props.label}
+                          className="theme-text">{restoreIcon}{props.label}
                 </sp-label>
             </sp-textarea>)
             break;
         case "int":
+            checkValue(value.value);
             comp = (
                 <NumberField
                     type={"int"}
                     min={props.variable?.min}
                     max={props.variable?.max}
                     label={props.label}
+                    labelIcon={restoreIcon}
                     style={{width: "100%"}}
                     value={value.value}
                     onInput={handleNumberInput}/>)
             break;
         case "number":
+            checkValue(value.value);
             comp = (
                 <NumberField
                     min={props.variable?.min}
                     max={props.variable?.max}
                     step={props.variable?.step}
                     label={props.label}
+                    labelIcon={restoreIcon}
                     style={{width: "100%"}}
                     value={value.value}
                     onInput={handleNumberInput}/>)
@@ -124,10 +152,12 @@ export function TaskVariable(props: {
                 state.taskVariablesFlat.value[props.name].value = randomSeed().toString();
                 value.value = state.taskVariablesFlat.value[props.name].value;
             }
+            checkValue(value.value);
             comp = (
                 <SeedField
                     max={props.variable?.max}
                     label={props.label}
+                    labelIcon={restoreIcon}
                     style={{width: "100%"}}
                     value={value.value}
                     onInput={handleNumberInput}
@@ -141,7 +171,7 @@ export function TaskVariable(props: {
                 step={props.variable.step ? props.variable.step : 1}
                 value={value ? value.value : 0}
                 style={{width: "100%", padding: "0px 5px"}}>
-                <sp-label slot="label">{props.label}</sp-label>
+                <sp-label slot="label">{restoreIcon}{props.label}</sp-label>
             </sp-slider>)
             break;
         case "model":
@@ -149,6 +179,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.checkpoints}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -157,6 +188,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.clip}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -165,6 +197,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.clipVision}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -173,6 +206,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.controlnet}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -181,6 +215,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.diffusers}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -189,6 +224,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.embeddings}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -197,6 +233,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.gligen}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -205,6 +242,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.hypernetworks}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -213,6 +251,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.loras}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -221,6 +260,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.styleModels}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -229,6 +269,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.upscaleModels}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -237,6 +278,7 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={state.models.value.vae}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
@@ -248,12 +290,16 @@ export function TaskVariable(props: {
             comp = (<ComboBox options={comboOptions}
                               onChange={handleOnChangeComboBox}
                               label={props.label}
+                              labelIcon={restoreIcon}
                               value={value.value}
                               minMenuWidth={300}/>)
             break;
         case "layer":
-            comp = (<LayerField label={props.label}
-                                value={value.value}/>)
+            checkValue(value.value);
+            comp = (<LayerField
+                label={props.label}
+                onChange={handleOnChangeLayerField}
+            />)
             break
         case "row":
             comp = (

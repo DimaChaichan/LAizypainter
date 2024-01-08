@@ -9,7 +9,8 @@ export function NumberField(props: {
     min?: number,
     max?: number,
     onInput?: (value: string | undefined) => void
-    label?: string
+    label?: string,
+    labelIcon?: any,
     style?: CSSProperties;
 }) {
     const input = useRef<HTMLInputElement>(null);
@@ -34,9 +35,9 @@ export function NumberField(props: {
             return props.type === "int" ? Math.round(props.min) : props.min;
         if (props.max && value > props.max)
             return props.type === "int" ? Math.round(props.max) : props.max;
-        if(value === Infinity)
+        if (value === Infinity)
             return Number.MAX_SAFE_INTEGER;
-        if(value === -Infinity)
+        if (value === -Infinity)
             return Number.MIN_SAFE_INTEGER;
         return value
     }
@@ -100,7 +101,7 @@ export function NumberField(props: {
             }}>
             {props.label ?
                 <sp-label slot="label"
-                          className="theme-text">{props.label}
+                          className="theme-text">{props.labelIcon}{props.label}
                 </sp-label> :
                 null}
         </sp-textfield>

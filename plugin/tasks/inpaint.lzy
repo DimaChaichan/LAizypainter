@@ -1,8 +1,6 @@
 {
   "config": {
-    "label": "IMG2IMG",
-    "uploadSize": 1024,
-    "mode": "loop"
+    "label": "INPAINTING"
   },
   "variables": {
     "positive": {
@@ -14,20 +12,6 @@
       "type": "text",
       "value": "text, watermark",
       "label": "Negative Prompt:"
-    },
-    "layer": {
-      "type": "layer",
-      "label": "Inpaint Layer:"
-    },
-    "denoise": {
-      "type": "slider",
-      "value": 0.8,
-      "min": 0.01,
-      "max": 1,
-      "step": 0.01,
-      "mapMax": 1,
-      "label": "AI Freedom (Denoise):",
-      "restore": false
     },
     "advanced": {
       "row1": {
@@ -110,9 +94,9 @@
         "cfg": "#cfg#",
         "sampler_name": "#sampler#",
         "scheduler": "#scheduler#",
-        "denoise": "#denoise#",
+        "denoise": 1,
         "model": [
-          "4",
+          "29",
           0
         ],
         "positive": [
@@ -124,23 +108,17 @@
           0
         ],
         "latent_image": [
-          "13",
+          "26",
           0
         ]
       },
       "class_type": "KSampler"
     },
-    "4": {
-      "inputs": {
-        "ckpt_name": "#model#"
-      },
-      "class_type": "CheckpointLoaderSimple"
-    },
     "6": {
       "inputs": {
         "text": "#positive#",
         "clip": [
-          "4",
+          "29",
           1
         ]
       },
@@ -150,7 +128,7 @@
       "inputs": {
         "text": "#negative#",
         "clip": [
-          "4",
+          "29",
           1
         ]
       },
@@ -163,7 +141,7 @@
           0
         ],
         "vae": [
-          "4",
+          "29",
           2
         ]
       },
@@ -179,20 +157,31 @@
       },
       "class_type": "SaveImage"
     },
-    "13": {
+    "26": {
       "inputs": {
+        "grow_mask_by": 6,
         "pixels": [
-          "15",
+          "30",
           0
         ],
         "vae": [
-          "4",
+          "29",
           2
+        ],
+        "mask": [
+          "30",
+          1
         ]
       },
-      "class_type": "VAEEncode"
+      "class_type": "VAEEncodeForInpaint"
     },
-    "15": {
+    "29": {
+      "inputs": {
+        "ckpt_name": "#model#"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
+    "30": {
       "inputs": {
         "image": "#image#",
         "choose file to upload": "image"

@@ -1,7 +1,6 @@
 {
   "config": {
-    "label": "LCM IMG2IMG",
-    "uploadSize": 1024
+    "label": "LCM IMG2IMG"
   },
   "variables": {
     "positive": {

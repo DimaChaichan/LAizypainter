@@ -1,9 +1,13 @@
 import {storage} from "uxp";
 import CryptoJS from "crypto-js";
-import {action, core} from "photoshop";
+import {action, app, core} from "photoshop";
 import Mexp from "math-expression-evaluator";
 import {EImageComfy} from "./store/store.tsx";
 import {ITaskVariable} from "./components/taskvariables/taskVariable.comp.tsx";
+import {LayerKind} from "photoshop/dom/Constants";
+import {Layers} from "photoshop/dom/collections/Layers";
+import {Layer} from "photoshop/dom/Layer";
+import {Document} from "photoshop/dom/Document";
 
 /**
  * Open native File Dialog
@@ -127,7 +131,7 @@ export function findValAndReplace(object: any, value: any, replace: any): any {
             continue
         if (object[k].includes(value)) {
             found = true
-            if (replace) {
+            if (replace !== undefined && replace !== null) {
                 object[k] = object[k].replace(value, replace);
                 if (typeof replace === "number") {
                     const mexp = new Mexp();
@@ -239,7 +243,6 @@ export function flatTaskConfig(name: string, variable: ITaskVariable | any, obj:
                     restore: variable.hasOwnProperty('restore') ? variable["restore"] : true
                 }
             }
-            console.log("variable",  obj[name])
             break;
     }
 }
@@ -259,6 +262,31 @@ export function isNumberInvalid(number: number) {
     return isNaN(number);
 
 }
+
+export function getAllLayer(document?: Document, kind?: LayerKind) {
+    let res: Array<Layer> = [];
+    const layers = document ? document.layers : app.activeDocument.layers;
+    return _flattLayers(layers, res, kind);
+}
+
+/**
+ * Flatt a Layer recursive
+ * @param layers
+ * @param res
+ * @param kind
+ * @private
+ */
+function _flattLayers(layers: Layers, res: Array<Layer>, kind?: LayerKind): Array<Layer> {
+    for (let i = 0; i < layers.length; i++) {
+        const layer = layers[i];
+        if (!kind || (kind && layer.kind === kind))
+            res.push(layer);
+        if (layer.layers)
+            _flattLayers(layer.layers, res, kind);
+    }
+    return res;
+}
+
 
 // #######################################################
 // Interface

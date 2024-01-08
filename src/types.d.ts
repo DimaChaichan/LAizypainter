@@ -10,6 +10,7 @@ declare module 'preact' {
             'sp-button-group': any;
             'sp-dropdown': any;
             'sp-menu-divider': any;
+            'sp-menu-group': any;
             'sp-textfield': any;
             'sp-textarea': any;
             'sp-checkbox': any;

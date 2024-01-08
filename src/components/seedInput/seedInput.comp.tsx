@@ -6,7 +6,8 @@ export function SeedField(props: {
     onInput?: (value: string | undefined) => void
     onRandomClick?: (value: string | undefined) => void
     max?: number,
-    label?: string
+    label?: string,
+    labelIcon?: any,
     style?: CSSProperties;
 }) {
     return (
@@ -16,6 +17,7 @@ export function SeedField(props: {
                 min={-1}
                 max={props.max}
                 label={props.label}
+                labelIcon={props.labelIcon}
                 style={{width: "100%"}}
                 value={props.value}
                 onInput={props.onInput}/>

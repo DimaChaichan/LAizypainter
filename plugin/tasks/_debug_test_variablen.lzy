@@ -1,7 +1,6 @@
 {
   "config": {
     "label": "Test Variables",
-    "uploadSize": 1024,
     "mode": "loop"
   },
   "variables": {

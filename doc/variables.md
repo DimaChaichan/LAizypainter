@@ -76,6 +76,11 @@ settings:
 - **label:** Variable label
 - **restore:** true | false: restore last saved value
 
+### Layer
+type: layer \
+settings:
+- **label:** Variable label
+
 ### Row
 type: row \
 A row is a container

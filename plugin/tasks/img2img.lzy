@@ -1,7 +1,6 @@
 {
   "config": {
     "label": "IMG2IMG",
-    "uploadSize": 1024,
     "mode": "loop"
   },
   "variables": {

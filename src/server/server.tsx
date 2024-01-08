@@ -2,11 +2,13 @@ import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETa
 import {app, core, imaging} from "photoshop";
 import {
     createFileInDataFolder, findVal,
-    findValAndReplace,
+    findValAndReplace, getAllLayer,
     map,
     randomSeed,
     serializeImageComfyData
 } from "../utils.tsx";
+import {encode} from "fast-png";
+import {ImageData} from "fast-png/src/types.ts";
 
 /**
  * Websocket server to communicate with ComfyUI Server (https://github.com/comfyanonymous/ComfyUI)
@@ -17,7 +19,7 @@ export class Server {
     socket: WebSocket | undefined;
 
     task: any;
-    taskConfig: ETaskConfig = {mode: "loop", uploadSize: undefined};
+    taskConfig: ETaskConfig = {mode: "loop"};
     taskVariables: any;
 
     clientId = "photoshopclient";
@@ -34,7 +36,7 @@ export class Server {
     }> = [];
 
     imageName = 'upload';
-    lastHistoryLength = -1;
+    lastHistoryID = -1;
     executingNodes: any = [];
     executingNodesCount = 0;
 
@@ -224,7 +226,7 @@ export class Server {
         if (!this.isConnected) {
             return;
         }
-        self.lastHistoryLength = -1;
+        self.lastHistoryID = -1;
         self.setLoopStatus(ELoopStatus.run)
         self.runTask()
     }
@@ -306,21 +308,17 @@ export class Server {
     private async prompt() {
         const self = this;
         let sameImage = false;
-
         if (self.taskStatus === ETaskStatus.stopping) {
             return;
         }
-
         if (self.taskStatus === ETaskStatus.run) {
             self.runLoopTask();
             return
         }
-
         if (!app.activeDocument) {
             self.runLoopTask();
             return;
         }
-
         if (core.isModal()) {
             self.runLoopTask();
             return;
@@ -332,7 +330,6 @@ export class Server {
             self.runLoopTask();
             return;
         }
-
         /**
          * This is a HUGE!!!! hack!!
          * But with the PS 23.3 there is a problem when Photoshop have open a Madal (like ColorPicker)
@@ -348,52 +345,18 @@ export class Server {
             self.runLoopTask();
             return
         }
-
         await core.executeAsModal(async () => {
-            let imageMaxSize = Math.max(app.activeDocument.height, app.activeDocument.width);
-            if (this.taskConfig?.uploadSize)
-                imageMaxSize = this.taskConfig?.uploadSize;
-
-            let size: any = {width: imageMaxSize}
-            if (app.activeDocument.height > app.activeDocument.width)
-                size = {height: imageMaxSize}
-
-            if (self.lastHistoryLength === app.activeDocument.historyStates.length) {
+            const lastHistory = app.activeDocument.historyStates[app.activeDocument.historyStates.length - 1];
+            if (self.lastHistoryID === lastHistory.id) {
                 self.setTaskStatus(ETaskStatus.done)
                 sameImage = true;
             } else {
-                self.lastHistoryLength = app.activeDocument.historyStates.length;
+                self.lastHistoryID = lastHistory.id;
 
-                const promptText = self.createPromptTask();
+                const promptText = await self.createPromptTask();
                 if (!promptText)
                     return
-
-                if (findVal(this.task, '#image#')) {
-                    const pixelData = await imaging.getPixels({targetSize: size, applyAlpha: true});
-                    self.setTaskStatus(ETaskStatus.pending)
-
-                    let jpegData = await imaging.encodeImageData({"imageData": pixelData.imageData, "base64": false});
-                    await pixelData.imageData.dispose();
-                    const tmpFile = await createFileInDataFolder(self.getImageName())
-                    // @ts-ignore
-                    await tmpFile.write(jpegData)
-
-                    const body = new FormData();
-                    body.append("overwrite", "true");
-                    // @ts-ignore
-                    body.append("image", tmpFile);
-
-                    const responseUpload = await self.fetch('/upload/image', {
-                        method: 'POST',
-                        body: body,
-                    })
-                    if (!responseUpload)
-                        return
-                    if (responseUpload.status !== 200) {
-                        self.stopLoop();
-                        throw `[ERROR] Upload Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
-                    }
-                }
+                self.setTaskStatus(ETaskStatus.pending)
 
                 self.executingNodes = promptText.prompt;
                 self.executingNodesCount = 0;
@@ -423,6 +386,42 @@ export class Server {
         }
     }
 
+    private async createUploadImage(name: string, size: {
+                                        width?: number,
+                                        height?: number,
+                                    }, documentID?: number | undefined,
+                                    layerID?: number | undefined) {
+        const pixelDataResult = await imaging.getPixels(
+            documentID && layerID ? {
+                documentID: documentID,
+                layerID: layerID
+            } : {
+                targetSize: size
+            });
+        const pixelData = await pixelDataResult.imageData.getData({});
+
+        const pngData: ImageData = {
+            width: pixelDataResult.imageData.width,
+            height: pixelDataResult.imageData.height,
+            data: (pixelData as Uint8Array),
+        }
+        const png = encode(pngData)
+
+        const tmpFile = await createFileInDataFolder(name)
+        await tmpFile.write(png)
+        await pixelDataResult.imageData.dispose();
+
+        const body = new FormData();
+        body.append("overwrite", "true");
+        // @ts-ignore
+        body.append("image", tmpFile);
+
+        return this.fetch('/upload/image', {
+            method: 'POST',
+            body: body,
+        })
+    }
+
     private async fetch(path: string, init?: RequestInit) {
         const self = this;
         if (self.status !== EServerStatus.connected)
@@ -432,7 +431,7 @@ export class Server {
 
     private clearTask() {
         this.timer = undefined;
-        this.lastHistoryLength = -1;
+        this.lastHistoryID = -1;
         this.setTaskStatus(ETaskStatus.stop)
         this.setLoopStatus(ELoopStatus.stop)
     }
@@ -562,7 +561,7 @@ export class Server {
     }
 
     private getImageName() {
-        return `${this.imageName}.jpg`
+        return `${this.imageName}.png`
     }
 
     private emitEvent(type: EServerEventTypes, payload: any) {
@@ -580,27 +579,79 @@ export class Server {
             const variable = this.taskVariables[keys[i]];
             if (variable === undefined ||
                 variable === null ||
-                (typeof variable === "number" && isNaN(variable))) {
+                !variable.hasOwnProperty('value')) {
+                return false;
+            }
+            const value = variable.value
+            if (value === undefined ||
+                value === null ||
+                (typeof value === "number" && isNaN(value))) {
                 return false;
             }
         }
         return true;
     }
 
-    private createPromptTask() {
+    private async createPromptTask() {
         if (!this.validatePromptTask()) {
             return;
         }
-        let taskCopy = JSON.parse(JSON.stringify(this.task)); // Deep Copy
+        let taskCopy: any = JSON.parse(JSON.stringify(this.task)); // Deep Copy
         taskCopy.client_id = this.clientId;
         if (this.taskVariables) {
-            Object.keys(this.taskVariables).map(key => {
+            let imageMaxSize = Math.max(app.activeDocument.height, app.activeDocument.width);
+            let size: any = {width: imageMaxSize}
+            if (app.activeDocument.height > app.activeDocument.width)
+                size = {height: imageMaxSize}
+
+            if (findVal(this.task, '#image#')) {
+                const responseUpload = await this.createUploadImage(this.getImageName(), size)
+                if (!responseUpload)
+                    return
+                if (responseUpload.status !== 200) {
+                    this.stopLoop();
+                    throw `[ERROR] Upload Main Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
+                }
+            }
+            findValAndReplace(taskCopy, '#image#', this.getImageName())
+
+            const keys = Object.keys(this.taskVariables);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
                 const variable = this.taskVariables[key];
-                const value = variable.value === -1 || variable.value === "-1" ? randomSeed() : variable.value;
+                let value = variable.value === -1 || variable.value === "-1" ? randomSeed() : variable.value;
+
+                if (typeof value === "object" &&
+                    value._id !== undefined &&
+                    value._docId !== undefined) {
+                    const document = app.documents.find(doc => doc.id === value._docId)
+                    if (!document) {
+                        this.stopLoop();
+                        throw `[ERROR] Document ${key}: Document from selected Layer not exist!`;
+                    }
+
+                    const allLayer = getAllLayer(document);
+                    const layer = allLayer.find(lay => lay.id === value._id)
+                    if (!layer) {
+                        this.stopLoop();
+                        throw `[ERROR] Document ${key}: Selected Layer not exist!`;
+                    }
+                    const name = `upload_${key}.png`
+                    const responseUpload = await this.createUploadImage(
+                        name, size, value._docId, value._id)
+                    if (!responseUpload)
+                        return
+                    if (responseUpload.status !== 200) {
+                        this.stopLoop();
+                        throw `[ERROR] Upload Image ${key}: ${responseUpload.statusText} Status: ${responseUpload.status}`;
+                    }
+                    findValAndReplace(taskCopy, `#${key}.x#`, layer.bounds.left)
+                    findValAndReplace(taskCopy, `#${key}.y#`, layer.bounds.top)
+                    value = name;
+                }
                 findValAndReplace(taskCopy, `#${key}#`, value)
-            })
+            }
         }
-        findValAndReplace(taskCopy, '#image#', this.getImageName())
         if (taskCopy.hasOwnProperty('config')) {
             delete taskCopy.config;
         }
