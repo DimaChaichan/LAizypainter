@@ -39,7 +39,8 @@ export function LayerField(props: {
         setLayers(getLayers())
     }
     const handleOnclickSelectedLayer = () => {
-        if (app.activeDocument.activeLayers.length) {
+        if (app.activeDocument.activeLayers.length &&
+            app.activeDocument.activeLayers[0].kind !== "group") {
             comboBoxRef.current.setLabel(app.activeDocument.activeLayers[0].name)
             props.onChange?.(app.activeDocument.activeLayers[0]);
         }
