@@ -11,7 +11,6 @@ settings:
 type: text \
 settings:
 - **value:** string value
-- **required:** bool value
 - **label:** Variable label
 - **restore:** true | false: restore last saved value
 
@@ -19,7 +18,6 @@ settings:
 type: textarea \
 settings:
 - **value:** string value
-- **required:** bool value
 - **label:** Variable label
 - **restore:** true | false: restore last saved value
 
@@ -79,7 +77,9 @@ settings:
 ### Layer
 type: layer \
 settings:
-- **label:** Variable label
+- **label:** Variable label \
+
+You have access to the x and y position with `"#layer.x#"` or `"#layer.y#"`
 
 ### Row
 type: row \
