@@ -386,14 +386,17 @@ export class Server {
         }
     }
 
-    private async createUploadImage(name: string, size: {
+    private async createUploadImage(name: string, applyAlpha: boolean = true, size: {
                                         width?: number,
                                         height?: number,
                                     }, documentID?: number | undefined,
                                     layerID?: number | undefined) {
         let options: any = {
             targetSize: size,
+            applyAlpha: applyAlpha
         }
+        const channels = applyAlpha ? 3 : 4;
+        let pixelDataMask;
         if (documentID && layerID) {
             const doc = getDocumentByID(documentID);
             options = {
@@ -404,17 +407,35 @@ export class Server {
                     top: 0,
                     right: doc.width,
                     bottom: doc.height
-                } : null
+                } : null,
+                applyAlpha: applyAlpha
             }
+            const maskObj = await imaging.getLayerMask(options);
+            pixelDataMask = await maskObj.imageData.getData({});
         }
-
         const pixelDataResult = await imaging.getPixels(options);
-        const pixelData = await pixelDataResult.imageData.getData({});
+        let pixelData = await pixelDataResult.imageData.getData({});
+
+        if (pixelDataMask) {
+            let mergedArray = new Uint8Array(pixelData.length);
+            mergedArray.set(pixelData);
+            for (let i = 0; i < pixelDataMask.length; i++) {
+                if (channels === 3) {
+                    const alpha = pixelDataMask[i] > 0 ? pixelDataMask[i] / 255 : 0;
+                    mergedArray[i * channels] = ((1 - alpha) * 255) + (alpha * pixelData[i * channels]);
+                    mergedArray[i * channels + 1] = ((1 - alpha) * 255) + (alpha * pixelData[i * channels + 1]);
+                    mergedArray[i * channels + 2] = ((1 - alpha) * 255) + (alpha * pixelData[i * channels + 2]);
+                } else
+                    mergedArray[(i + 1) * channels - 1] = pixelDataMask[i];
+            }
+            pixelData = mergedArray;
+        }
 
         const pngData: ImageData = {
             width: pixelDataResult.imageData.width,
             height: pixelDataResult.imageData.height,
             data: (pixelData as Uint8Array),
+            channels: channels
         }
         const png = encode(pngData)
 
@@ -616,7 +637,7 @@ export class Server {
                 size = {height: imageMaxSize}
 
             if (findVal(this.task, '#image#')) {
-                const responseUpload = await this.createUploadImage(this.getImageName(), size)
+                const responseUpload = await this.createUploadImage(this.getImageName(), true, size)
                 if (!responseUpload)
                     return
                 if (responseUpload.status !== 200) {
@@ -649,7 +670,7 @@ export class Server {
                     }
                     const name = `upload_${key}.png`
                     const responseUpload = await this.createUploadImage(
-                        name, size, value._docId, value._id)
+                        name, false, size, value._docId, value._id)
                     if (!responseUpload)
                         return
                     if (responseUpload.status !== 200) {
