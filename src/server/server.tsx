@@ -2,7 +2,7 @@ import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETa
 import {app, core, imaging} from "photoshop";
 import {
     createFileInDataFolder, findVal,
-    findValAndReplace, getAllLayer,
+    findValAndReplace, getAllLayer, getDocumentByID,
     map,
     randomSeed,
     serializeImageComfyData
@@ -391,13 +391,24 @@ export class Server {
                                         height?: number,
                                     }, documentID?: number | undefined,
                                     layerID?: number | undefined) {
-        const pixelDataResult = await imaging.getPixels(
-            documentID && layerID ? {
+        let options: any = {
+            targetSize: size,
+        }
+        if (documentID && layerID) {
+            const doc = getDocumentByID(documentID);
+            options = {
                 documentID: documentID,
-                layerID: layerID
-            } : {
-                targetSize: size
-            });
+                layerID: layerID,
+                sourceBounds: doc ? {
+                    left: 0,
+                    top: 0,
+                    right: doc.width,
+                    bottom: doc.height
+                } : null
+            }
+        }
+
+        const pixelDataResult = await imaging.getPixels(options);
         const pixelData = await pixelDataResult.imageData.getData({});
 
         const pngData: ImageData = {

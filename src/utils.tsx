@@ -263,10 +263,23 @@ export function isNumberInvalid(number: number) {
 
 }
 
+/**
+ * Get all Layer from document, with layer in groups.
+ * @param document
+ * @param kind
+ */
 export function getAllLayer(document?: Document, kind?: LayerKind) {
     let res: Array<Layer> = [];
     const layers = document ? document.layers : app.activeDocument.layers;
     return _flattLayers(layers, res, kind);
+}
+
+/**
+ * Get Document by ID
+ * @param id
+ */
+export function getDocumentByID(id: number) {
+    return app.documents.find(document => document.id === id);
 }
 
 /**
