@@ -49,12 +49,12 @@ settings:
 - **min:** integer
 - **max:** integer
 - **step:** integer
-- **restore:** true | false: restore last saved value
+- **restore:** true | false: restore last saved value[ipadapter_im2img](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_im2img)
 
 ### Seed
 type: seed \
 settings:
-- **value:** number | random: create a random value on task open, -1: create a random value on every prompt
+- **value:** number, -2: create a random value on task open, -1: create a random value on every prompt
 - **label:** Variable label
 - **max:** integer
 - **restore:** true | false: restore last saved value
@@ -101,6 +101,5 @@ All variables in the key advance will appear as "Advanced Options"
 ```
 
 ### Tips
-The Value **-1** will be replaced with a random seed\
 **Strings** can be concatenated e.g. `"#positive#, cartoon style"`\
 **Numbers** can use expression e.g. `"#steps# + 10"`

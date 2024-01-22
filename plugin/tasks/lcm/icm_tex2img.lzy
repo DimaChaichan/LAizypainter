@@ -19,7 +19,7 @@
         "type": "row",
         "seed": {
           "type": "seed",
-          "value": "random",
+          "value": -2,
           "label": "Seed:",
           "restore": false
         },

@@ -148,7 +148,7 @@ export function TaskVariable(props: {
                     onInput={handleNumberInput}/>)
             break;
         case "seed":
-            if (value.value === "random") {
+            if (value.value === -2) {
                 state.taskVariablesFlat.value[props.name].value = randomSeed().toString();
                 value.value = state.taskVariablesFlat.value[props.name].value;
             }

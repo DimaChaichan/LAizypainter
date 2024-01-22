@@ -152,7 +152,7 @@
       },
       "seed3": {
         "type": "seed",
-        "value": "random",
+        "value": -2,
         "label": "Number random:"
       }
     },
