@@ -268,7 +268,7 @@ export function isNumberInvalid(number: number) {
  * @param document
  * @param kind
  */
-export function getAllLayer(document?: Document, kind?: LayerKind) {
+export async function getAllLayer(document?: Document, kind?: LayerKind) {
     let res: Array<Layer> = [];
     const layers = document ? document.layers : app.activeDocument.layers;
     return _flattLayers(layers, res, kind);
@@ -280,6 +280,16 @@ export function getAllLayer(document?: Document, kind?: LayerKind) {
  */
 export function getDocumentByID(id: number) {
     return app.documents.find(document => document.id === id);
+}
+
+/**
+ * Get Layer by ID
+ * @param id
+ * @param document
+ */
+export async function getLayerByID(id: number, document: Document) {
+    const layers = await getAllLayer(document);
+    return layers.find(layer => layer.id === id);
 }
 
 /**

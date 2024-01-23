@@ -2,7 +2,7 @@ import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETa
 import {app, core, imaging} from "photoshop";
 import {
     createFileInDataFolder, findVal,
-    findValAndReplace, getAllLayer, getDocumentByID,
+    findValAndReplace, getAllLayer, getDocumentByID, getLayerByID,
     map,
     randomSeed,
     serializeImageComfyData
@@ -410,13 +410,18 @@ export class Server {
                 } : null,
                 applyAlpha: applyAlpha
             }
-            const maskObj = await imaging.getLayerMask(options);
-            pixelDataMask = await maskObj.imageData.getData({});
+            // It is currently not possible to check, has a layer a mask or not
+            // TODO: find a better solution
+            try {
+                const maskObj = await imaging.getLayerMask(options);
+                pixelDataMask = await maskObj.imageData.getData({});
+            } catch (e) {
+            }
         }
         const pixelDataResult = await imaging.getPixels(options);
         let pixelData = await pixelDataResult.imageData.getData({});
 
-        if (pixelDataMask) {
+        if (pixelDataMask && pixelDataMask.length) {
             let mergedArray = new Uint8Array(pixelData.length);
             mergedArray.set(pixelData);
             for (let i = 0; i < pixelDataMask.length; i++) {
@@ -662,15 +667,20 @@ export class Server {
                         throw `[ERROR] Document ${key}: Document from selected Layer not exist!`;
                     }
 
-                    const allLayer = getAllLayer(document);
+                    const allLayer = await getAllLayer(document);
                     const layer = allLayer.find(lay => lay.id === value._id)
                     if (!layer) {
                         this.stopLoop();
                         throw `[ERROR] Document ${key}: Selected Layer not exist!`;
                     }
+
                     const name = `upload_${key}.png`
                     const responseUpload = await this.createUploadImage(
-                        name, false, size, value._docId, value._id)
+                        name,
+                        layer.positionLocked,
+                        size,
+                        value._docId,
+                        value._id)
                     if (!responseUpload)
                         return
                     if (responseUpload.status !== 200) {
