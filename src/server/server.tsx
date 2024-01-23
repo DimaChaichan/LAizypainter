@@ -2,7 +2,7 @@ import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETa
 import {app, core, imaging} from "photoshop";
 import {
     createFileInDataFolder, findVal,
-    findValAndReplace, getAllLayer, getDocumentByID, getLayerByID,
+    findValAndReplace, getAllLayer, getDocumentByID,
     map,
     randomSeed,
     serializeImageComfyData

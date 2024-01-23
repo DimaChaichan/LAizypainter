@@ -10,9 +10,8 @@ function flatLayers(layer: Layer, array: Array<ComboBoxItem | ComboBoxDividerIte
             for (let i = 0; i < layer.layers.length; i++) {
                 flatLayers(layer.layers[i], array)
             }
-    } else
-        array.push({label: layer.name, value: layer})
-
+    } else if (layer.kind === 'pixel')
+        array.push({label: `${layer.name} : ${layer.document.name}`, value: layer})
 }
 
 export function LayerField(props: {
@@ -39,9 +38,13 @@ export function LayerField(props: {
         setLayers(getLayers())
     }
     const handleOnclickSelectedLayer = () => {
-        if (app.activeDocument.activeLayers.length &&
-            app.activeDocument.activeLayers[0].kind !== "group") {
-            comboBoxRef.current.setLabel(app.activeDocument.activeLayers[0].name)
+        if (app.activeDocument.activeLayers.length) {
+            if (app.activeDocument.activeLayers[0].kind !== "pixel") {
+                app.showAlert("Only pixel layer can be select!")
+                return
+            }
+            const layer = app.activeDocument.activeLayers[0];
+            comboBoxRef.current.setLabel(`${layer.name} : ${layer.document.name}`)
             props.onChange?.(app.activeDocument.activeLayers[0]);
         }
     }
