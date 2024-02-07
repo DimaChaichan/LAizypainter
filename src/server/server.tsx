@@ -2,7 +2,7 @@ import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETa
 import {app, core, imaging} from "photoshop";
 import {
     createFileInDataFolder, findVal,
-    findValAndReplace, getAllLayer, getDocumentByID,
+    findValAndReplace, getAllLayer, getDocumentByID, getLayerByID,
     map,
     randomSeed,
     serializeImageComfyData
@@ -386,29 +386,29 @@ export class Server {
         }
     }
 
-    private async createUploadImage(name: string, applyAlpha: boolean = true, size: {
-                                        width?: number,
-                                        height?: number,
-                                    }, documentID?: number | undefined,
-                                    layerID?: number | undefined) {
+    // TODO: move to utility class
+    private async createUploadImage(name: string, documentID: number, size: {
+        width?: number,
+        height?: number,
+    }, layerID?: number | undefined) {
+        const doc = getDocumentByID(documentID);
+        const channels = 4;
+        let pixelDataMask = undefined;
+
         let options: any = {
+            documentID: documentID,
             targetSize: size,
-            applyAlpha: applyAlpha
+            applyAlpha: false
         }
-        const channels = applyAlpha ? 3 : 4;
-        let pixelDataMask;
-        if (documentID && layerID) {
-            const doc = getDocumentByID(documentID);
-            options = {
-                documentID: documentID,
-                layerID: layerID,
-                sourceBounds: doc ? {
-                    left: 0,
-                    top: 0,
-                    right: doc.width,
-                    bottom: doc.height
-                } : null,
-                applyAlpha: applyAlpha
+        if (layerID && doc) {
+            const layer = await getLayerByID(layerID, doc);
+            options.layerID = layerID;
+            options.kind = "user";
+            options.sourceBounds = {
+                left: layer ? layer.bounds.left : 0,
+                top: layer ? layer.bounds.top : 0,
+                right: layer ? layer.bounds.left + layer.bounds.width : 0,
+                bottom: layer ? layer.bounds.top + layer.bounds.height : 0
             }
             // It is currently not possible to check, has a layer a mask or not
             // TODO: find a better solution
@@ -418,6 +418,7 @@ export class Server {
             } catch (e) {
             }
         }
+
         const pixelDataResult = await imaging.getPixels(options);
         let pixelData = await pixelDataResult.imageData.getData({});
 
@@ -425,13 +426,7 @@ export class Server {
             let mergedArray = new Uint8Array(pixelData.length);
             mergedArray.set(pixelData);
             for (let i = 0; i < pixelDataMask.length; i++) {
-                if (channels === 3) {
-                    const alpha = pixelDataMask[i] > 0 ? pixelDataMask[i] / 255 : 0;
-                    mergedArray[i * channels] = ((1 - alpha) * 255) + (alpha * pixelData[i * channels]);
-                    mergedArray[i * channels + 1] = ((1 - alpha) * 255) + (alpha * pixelData[i * channels + 1]);
-                    mergedArray[i * channels + 2] = ((1 - alpha) * 255) + (alpha * pixelData[i * channels + 2]);
-                } else
-                    mergedArray[(i + 1) * channels - 1] = pixelDataMask[i];
+                mergedArray[(i + 1) * channels - 1] = (mergedArray[(i + 1) * channels - 1] * pixelDataMask[i]) / 255;
             }
             pixelData = mergedArray;
         }
@@ -642,7 +637,10 @@ export class Server {
                 size = {height: imageMaxSize}
 
             if (findVal(this.task, '#image#')) {
-                const responseUpload = await this.createUploadImage(this.getImageName(), true, size)
+                const responseUpload = await this.createUploadImage(
+                    this.getImageName(),
+                    app.activeDocument.id,
+                    size)
                 if (!responseUpload)
                     return
                 if (responseUpload.status !== 200) {
@@ -658,37 +656,55 @@ export class Server {
                 const variable = this.taskVariables[key];
                 let value = variable.value === -1 || variable.value === "-1" ? randomSeed() : variable.value;
 
-                if (typeof value === "object" &&
-                    value._id !== undefined &&
-                    value._docId !== undefined) {
-                    const document = app.documents.find(doc => doc.id === value._docId)
+                if (typeof value === "object") {
+                    const docId = value.selection ? value.selection._docId : value._docId;
+                    const layerId = value.selection ? undefined : value._id;
+
+                    if (!docId) {
+                        this.stopLoop();
+                        throw `[ERROR] Document ${key}: not exist!`;
+                    }
+
+                    const document = app.documents.find(doc => doc.id === docId)
                     if (!document) {
                         this.stopLoop();
                         throw `[ERROR] Document ${key}: Document from selected Layer not exist!`;
                     }
 
-                    const allLayer = await getAllLayer(document);
-                    const layer = allLayer.find(lay => lay.id === value._id)
-                    if (!layer) {
-                        this.stopLoop();
-                        throw `[ERROR] Document ${key}: Selected Layer not exist!`;
+                    let boundsLeft = 0;
+                    let boundsTop = 0;
+                    let width = document.width;
+                    let height = document.height;
+
+                    if (layerId) {
+                        const allLayer = await getAllLayer(document);
+                        const layer = allLayer.find(lay => lay.id === layerId)
+                        if (!layer) {
+                            this.stopLoop();
+                            throw `[ERROR] Document ${key}: Selected Layer not exist!`;
+                        }
+                        boundsLeft = layer.bounds.left;
+                        boundsTop = layer.bounds.top;
+                        width = layer.bounds.width;
+                        height = layer.bounds.height;
                     }
 
                     const name = `upload_${key}.png`
                     const responseUpload = await this.createUploadImage(
                         name,
-                        layer.positionLocked,
-                        size,
-                        value._docId,
-                        value._id)
+                        docId,
+                        {},
+                        layerId)
                     if (!responseUpload)
                         return
                     if (responseUpload.status !== 200) {
                         this.stopLoop();
                         throw `[ERROR] Upload Image ${key}: ${responseUpload.statusText} Status: ${responseUpload.status}`;
                     }
-                    findValAndReplace(taskCopy, `#${key}.x#`, layer.bounds.left)
-                    findValAndReplace(taskCopy, `#${key}.y#`, layer.bounds.top)
+                    findValAndReplace(taskCopy, `#${key}.x#`, boundsLeft)
+                    findValAndReplace(taskCopy, `#${key}.y#`, boundsTop)
+                    findValAndReplace(taskCopy, `#${key}.width#`, width)
+                    findValAndReplace(taskCopy, `#${key}.height#`, height)
                     value = name;
                 }
                 findValAndReplace(taskCopy, `#${key}#`, value)

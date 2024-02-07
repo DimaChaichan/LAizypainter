@@ -74,11 +74,13 @@ settings:
 - **label:** Variable label
 - **restore:** true | false: restore last saved value
 
-### Layer
+### Laye
 type: layer \
 settings:
 - **label:** Variable label \
 
+You can select a single Layer or a Document. \
+You have access to the width and height with `"#layer.width#"` or `"#layer.height#"` \
 You have access to the x and y position with `"#layer.x#"` or `"#layer.y#"`
 
 ### Row

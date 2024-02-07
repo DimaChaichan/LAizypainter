@@ -5,6 +5,7 @@ import {NumberField} from "../numberField/numberField.comp.tsx";
 import {SeedField} from "../seedInput/seedInput.comp.tsx";
 import {LayerField} from "../layerField/layerField.tsx";
 import {Layer} from "photoshop/dom/Layer";
+import {Document} from "photoshop/dom/Document";
 import ComboBox from "../comboBox/comboBox.comp.tsx";
 
 export function TaskVariable(props: {
@@ -58,7 +59,7 @@ export function TaskVariable(props: {
         setVariable(option, true);
         setInvalid(option === "");
     };
-    const handleOnChangeLayerField = (layer: Layer) => {
+    const handleOnChangeLayerField = (layer: Layer | Document) => {
         setVariable(layer, true, undefined, false);
         setInvalid(false);
     };
