@@ -45,7 +45,7 @@ If you use a service like https://rundiffusion.com. You can simply copy the URL 
 browser for this.
 
 ## Task
-
+Example Tasks: [task.md](doc%2Ftask.md) \
 A task is a prompt (workflow) which is sent to the server. You can find example tasks here: [tasks](plugin%2Ftasks)
 
 A task has a Config, variables and a prompt section. \
