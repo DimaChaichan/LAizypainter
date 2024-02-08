@@ -45,8 +45,7 @@ If you use a service like https://rundiffusion.com. You can simply copy the URL 
 browser for this.
 
 ## Task
-Example Tasks: [task.md](doc%2Ftask.md) \
-A task is a prompt (workflow) which is sent to the server. You can find example tasks here: [tasks](plugin%2Ftasks)
+A task is a prompt (workflow) which is sent to the server. You can find example tasks here: [tasks](doc%2Ftask.md)
 
 A task has a Config, variables and a prompt section. \
 The prompt section is the prompt payload that is sent to the server. \
@@ -92,7 +91,9 @@ In the Variables area you can define variables and use them in the prompt. e.g
 #positive# is now replaced with the text from the text box. \
 This makes it possible to build special tasks.
 
-The value **#image#** stands for the current image in Photoshop.
+The value **#image#** stands for the current image in Photoshop. \
+The value **#selection#** stands for selection as image like a [Quick Mask](https://helpx.adobe.com/photoshop/using/create-temporary-quick-mask.html) \
+The value **#selectionImage#** stands for selection in the current image.
 
 ### Variables Types
 See here: [Variables](doc%2Fvariables.md)

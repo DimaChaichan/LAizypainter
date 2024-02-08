@@ -1,5 +1,5 @@
 import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
-import {app, core, imaging} from "photoshop";
+import {action, app, core, imaging} from "photoshop";
 import {
     createFileInDataFolder, findVal,
     findValAndReplace, getAllLayer, getDocumentByID, getLayerByID,
@@ -354,8 +354,10 @@ export class Server {
                 self.lastHistoryID = lastHistory.id;
 
                 const promptText = await self.createPromptTask();
-                if (!promptText)
+                if (!promptText) {
+                    self.runLoopTask();
                     return
+                }
                 self.setTaskStatus(ETaskStatus.pending)
 
                 self.executingNodes = promptText.prompt;
@@ -386,8 +388,7 @@ export class Server {
         }
     }
 
-    // TODO: move to utility class
-    private async createUploadImage(name: string, documentID: number, size: {
+    private async createImage(documentID: number, size: {
         width?: number,
         height?: number,
     }, layerID?: number | undefined) {
@@ -415,6 +416,7 @@ export class Server {
             try {
                 const maskObj = await imaging.getLayerMask(options);
                 pixelDataMask = await maskObj.imageData.getData({});
+                await maskObj.imageData.dispose();
             } catch (e) {
             }
         }
@@ -430,18 +432,112 @@ export class Server {
             }
             pixelData = mergedArray;
         }
+        const width = pixelDataResult.imageData.width;
+        const height = pixelDataResult.imageData.height;
+        await pixelDataResult.imageData.dispose();
 
-        const pngData: ImageData = {
-            width: pixelDataResult.imageData.width,
-            height: pixelDataResult.imageData.height,
-            data: (pixelData as Uint8Array),
+        // Fix Locked Layers with only 3 channels
+        const fullPixelLength = width * height * channels;
+        if (pixelData.length < fullPixelLength) {
+            let mergedArray = new Uint8Array(fullPixelLength);
+            for (let i = 0; i < width * height; i++) {
+                mergedArray[i * channels] = pixelData[i * (channels - 1)];
+                mergedArray[(i * channels) + 1] = pixelData[(i * (channels - 1)) + 1];
+                mergedArray[(i * channels) + 2] = pixelData[(i * (channels - 1)) + 2];
+                mergedArray[(i * channels) + 3] = 255;
+            }
+            pixelData = mergedArray;
+        }
+
+        return {
+            width: width,
+            height: height,
+            pixelData: (pixelData as Uint8Array)
+        }
+    }
+
+    private async uploadImage(name: string, documentID: number, size: {
+        width?: number,
+        height?: number,
+    }, layerID?: number | undefined) {
+        const image = await this.createImage(documentID, size, layerID)
+        return this._uploadImage(
+            name,
+            image.width,
+            image.height,
+            image.pixelData,
+            4)
+    }
+
+
+    private async uploadSelectionImage(name: string, documentID: number) {
+        const selectMaskDataResult = await imaging.getSelection({
+            documentID: documentID
+        });
+        let selectMaskData = await selectMaskDataResult.imageData.getData({});
+
+        const width = selectMaskDataResult.imageData.width;
+        const height = selectMaskDataResult.imageData.height;
+        await selectMaskDataResult.imageData.dispose();
+        return this._uploadImage(
+            name,
+            width,
+            height,
+            (selectMaskData as Uint8Array),
+            1)
+    }
+
+    private async uploadSelectionDocumentImage(name: string, documentID: number) {
+        const selection: any = await this.getSelection();
+        const image = await this.createImage(documentID, {})
+
+        const selectMaskDataResult = await imaging.getSelection({
+            documentID: documentID
+        });
+        let selectMaskData = await selectMaskDataResult.imageData.getData({});
+
+        let mergedArray = new Uint8Array(image.pixelData.length);
+        mergedArray.set(image.pixelData);
+        for (let i = 0; i < image.height; i++) {
+            if (i >= selection.top && i < selection.bottom) {
+                for (let j = 0; j < image.width; j++) {
+                    if (j >= selection.left && j < selection.right) {
+                        const pos = ((i * image.width) + j) * 4;
+                        const selectionPos = ((i - selection.top) * selection.width) + (j - selection.left);
+                        mergedArray[(pos) + 3] = Math.abs(selectMaskData[selectionPos] - 255);
+                    }
+                    if (j > selection.right)
+                        break;
+                }
+            }
+            if (i > selection.bottom)
+                break;
+        }
+        await selectMaskDataResult.imageData.dispose();
+        return this._uploadImage(
+            name,
+            image.width,
+            image.height,
+            (mergedArray as Uint8Array),
+            4)
+    }
+
+    private async _uploadImage(name: string,
+                               width: number,
+                               height: number,
+                               data: Uint8Array,
+                               channels: number) {
+        let pngData: ImageData = {
+            width: width,
+            height: height,
+            data: data,
             channels: channels
         }
+
         const png = encode(pngData)
 
         const tmpFile = await createFileInDataFolder(name)
         await tmpFile.write(png)
-        await pixelDataResult.imageData.dispose();
 
         const body = new FormData();
         body.append("overwrite", "true");
@@ -596,6 +692,14 @@ export class Server {
         return `${this.imageName}.png`
     }
 
+    private getSelectionName() {
+        return `${this.imageName}_selection.png`
+    }
+
+    private getSelectionImageName() {
+        return `${this.imageName}_selectionImage.png`
+    }
+
     private emitEvent(type: EServerEventTypes, payload: any) {
         this.handler.map((handle) => {
             if (handle.type === type)
@@ -624,6 +728,44 @@ export class Server {
         return true;
     }
 
+    private async getSelection() {
+        let selection: any;
+        await core.executeAsModal(async () => {
+                const result = await action.batchPlay(
+                    [
+                        {
+                            "_obj": "get",
+                            "_target": [
+                                {
+                                    "_property": "selection"
+                                },
+                                {
+                                    "_ref": "document",
+                                    "_id": app.activeDocument.id
+                                }
+                            ],
+                            "_options": {
+                                "dialogOptions": "dontDisplay"
+                            }
+                        }
+                    ],
+                    {
+                        modalBehavior: "execute"
+                    })
+                selection = result.length ? result[0].selection : undefined;
+            },
+            {"commandName": `Get selection Infos`})
+        if (selection) {
+            selection.left = selection.left._value;
+            selection.right = selection.right._value;
+            selection.top = selection.top._value;
+            selection.bottom = selection.bottom._value;
+            selection.width = selection.right - selection.left;
+            selection.height = selection.bottom - selection.top;
+        }
+        return selection;
+    }
+
     private async createPromptTask() {
         if (!this.validatePromptTask()) {
             return;
@@ -636,8 +778,9 @@ export class Server {
             if (app.activeDocument.height > app.activeDocument.width)
                 size = {height: imageMaxSize}
 
+            let selection: any = await this.getSelection();
             if (findVal(this.task, '#image#')) {
-                const responseUpload = await this.createUploadImage(
+                const responseUpload = await this.uploadImage(
                     this.getImageName(),
                     app.activeDocument.id,
                     size)
@@ -647,8 +790,42 @@ export class Server {
                     this.stopLoop();
                     throw `[ERROR] Upload Main Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
                 }
+                findValAndReplace(taskCopy, '#image#', this.getImageName())
             }
-            findValAndReplace(taskCopy, '#image#', this.getImageName())
+
+            if (findVal(this.task, '#selection#')) {
+                if (!selection)
+                    return;
+
+                const responseUpload = await this.uploadSelectionImage(
+                    this.getSelectionName(),
+                    app.activeDocument.id)
+                if (!responseUpload)
+                    return
+                if (responseUpload.status !== 200) {
+                    this.stopLoop();
+                    throw `[ERROR] Upload Select Mask Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
+                }
+                findValAndReplace(taskCopy, '#selection#', this.getSelectionName())
+                findValAndReplace(taskCopy, '#selection.x#', selection.left)
+                findValAndReplace(taskCopy, '#selection.y#', selection.top)
+            }
+
+            if (findVal(this.task, '#selectionImage#')) {
+                if (!selection)
+                    return;
+
+                const responseUpload = await this.uploadSelectionDocumentImage(
+                    this.getSelectionImageName(),
+                    app.activeDocument.id)
+                if (!responseUpload)
+                    return
+                if (responseUpload.status !== 200) {
+                    this.stopLoop();
+                    throw `[ERROR] Upload Select Mask Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
+                }
+                findValAndReplace(taskCopy, '#selectionImage#', this.getSelectionImageName())
+            }
 
             const keys = Object.keys(this.taskVariables);
             for (let i = 0; i < keys.length; i++) {
@@ -690,7 +867,7 @@ export class Server {
                     }
 
                     const name = `upload_${key}.png`
-                    const responseUpload = await this.createUploadImage(
+                    const responseUpload = await this.uploadImage(
                         name,
                         docId,
                         {},

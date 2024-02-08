@@ -74,7 +74,7 @@ settings:
 - **label:** Variable label
 - **restore:** true | false: restore last saved value
 
-### Laye
+### Layer
 type: layer \
 settings:
 - **label:** Variable label \
