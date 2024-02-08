@@ -791,6 +791,8 @@ export class Server {
                     throw `[ERROR] Upload Main Image: ${responseUpload.statusText} Status: ${responseUpload.status}`;
                 }
                 findValAndReplace(taskCopy, '#image#', this.getImageName())
+                findValAndReplace(taskCopy, '#image.width#', app.activeDocument.width)
+                findValAndReplace(taskCopy, '#image.height#', app.activeDocument.height)
             }
 
             if (findVal(this.task, '#selection#')) {

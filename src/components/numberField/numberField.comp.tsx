@@ -49,7 +49,6 @@ export function NumberField(props: {
             if (!isNumberInvalid(newVal)) {
                 if (props.type === "int")
                     newVal = Math.round(newVal);
-                newVal = newVal.toString()
             } else
                 newVal = undefined;
             props.onInput?.(newVal);
