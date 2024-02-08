@@ -25,3 +25,11 @@ Use the selected Layer with the selection for inpainting. \
 Node Requirements: none
 ![inpaint_select_layer.png](..%2Fplugin%2Ftasks%2Finpaint%2Finpaint_select_layer.png)
 
+### Custom
+#### DDColor
+Example file:[DDColor.lzy](..%2Fplugin%2Ftasks%2Fcustom%2FDDColor.lzy)\
+Colourise Images with DDColor \
+Node Requirements: [DDcolor](https://github.com/kijai/ComfyUI-DDColor?tab=readme-ov-file)
+![DDColor.png](..%2Fplugin%2Ftasks%2Fcustom%2FDDColor.png)
+
+

@@ -1,0 +1,60 @@
+{
+  "config": {
+    "label": "DDColor",
+    "mode": "single"
+  },
+  "variables": {
+    "checkpoint": {
+      "type": "combo",
+      "options": [
+        "ddcolor_paper_tiny.pth",
+        "ddcolor_paper.pth",
+        "ddcolor_modelscope.pth",
+        "ddcolor_artistic.pth"
+      ],
+      "label": "Checkpoint",
+      "value": "ddcolor_paper.pth"
+    },
+    "inputSize": {
+      "type": "combo",
+      "options": [
+        "256",
+        "512",
+        "1024"
+      ],
+      "label": "Input Size",
+      "value": "256"
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "74": {
+      "inputs": {
+        "model_input_size": "#inputSize#",
+        "checkpoint": "#checkpoint#",
+        "image": [
+          "75",
+          0
+        ]
+      },
+      "class_type": "DDColor_Colorize"
+    },
+    "75": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "77": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "74",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    }
+  }
+}
