@@ -51,6 +51,8 @@ A task has a Config, variables and a prompt section. \
 The prompt section is the prompt payload that is sent to the server. \
 In ComfyUI you get this by clicking on "Save (API Format)". The developer mode must be active.
 
+You can use this ComfyUI Plugin to create simple Task from you exist Workflows: [LAizypainter-Exporter-ComfyUI](https://github.com/DimaChaichan/LAizypainter-Exporter-ComfyUI) 
+
 The config area has some settings for the Task.
 
 ``` Json
@@ -92,6 +94,7 @@ In the Variables area you can define variables and use them in the prompt. e.g
 This makes it possible to build special tasks.
 
 The value **#image#** stands for the current image in Photoshop. \
+With **#image.width#**, **#image.height#** you get the current width and height from Image. \
 The value **#selection#** stands for selection as image like a [Quick Mask](https://helpx.adobe.com/photoshop/using/create-temporary-quick-mask.html) \
 The value **#selectionImage#** stands for selection in the current image.
 
