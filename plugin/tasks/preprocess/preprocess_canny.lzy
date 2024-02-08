@@ -1,0 +1,54 @@
+{
+  "config": {
+    "label": "Preporcess Canny",
+    "mode": "single"
+  },
+  "variables": {
+    "low_threshold": {
+      "type": "slider",
+      "label": "Low threshold",
+      "value": 100,
+      "min": 0,
+      "max": 1000
+    },
+    "high_threshold": {
+      "type": "slider",
+      "label": "High threshold",
+      "value": 200,
+      "min": 0,
+      "max": 1000
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "78": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "79": {
+      "inputs": {
+        "low_threshold": "#low_threshold#",
+        "high_threshold": "#high_threshold#",
+        "resolution": "#image.width#",
+        "image": [
+          "78",
+          0
+        ]
+      },
+      "class_type": "CannyEdgePreprocessor"
+    },
+    "81": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "79",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "config": {
+    "label": "Preporcess OpenPose",
+    "mode": "single"
+  },
+  "variables": {
+    "detect_hand": {
+      "type": "combo",
+      "options": [
+        "enable",
+        "disable"
+      ],
+      "label": "Detect Hand",
+      "value": "enable"
+    },
+    "detect_body": {
+      "type": "combo",
+      "options": [
+        "enable",
+        "disable"
+      ],
+      "label": "Detect Body",
+      "value": "enable"
+    },
+    "detect_face": {
+      "type": "combo",
+      "options": [
+        "enable",
+        "disable"
+      ],
+      "label": "Detect Face",
+      "value": "enable"
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "1": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "50": {
+      "inputs": {
+        "detect_hand": "#detect_hand#",
+        "detect_body": "#detect_body#",
+        "detect_face": "#detect_face#",
+        "resolution": "#image.width#",
+        "image": [
+          "1",
+          0
+        ]
+      },
+      "class_type": "OpenposePreprocessor"
+    },
+    "51": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "50",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    }
+  }
+}

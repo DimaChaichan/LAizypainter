@@ -1,0 +1,48 @@
+{
+  "config": {
+    "label": "Preporcess Realistic",
+    "mode": "single"
+  },
+  "variables": {
+    "coarse": {
+      "type": "combo",
+      "options": [
+        "enable",
+        "disable"
+      ],
+      "label": "Coarse",
+      "value": "enable"
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "1": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "48": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "49",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "49": {
+      "inputs": {
+        "coarse": "#coarse#",
+        "resolution": "#image.width#",
+        "image": [
+          "1",
+          0
+        ]
+      },
+      "class_type": "LineArtPreprocessor"
+    }
+  }
+}

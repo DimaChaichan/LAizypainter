@@ -1,0 +1,48 @@
+{
+  "config": {
+    "label": "Preporcess Scribble",
+    "mode": "single"
+  },
+  "variables": {
+    "safe": {
+      "type": "combo",
+      "options": [
+        "enable",
+        "disable"
+      ],
+      "label": "Safe",
+      "value": "enable"
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "1": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "48": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "50",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "50": {
+      "inputs": {
+        "safe": "#safe#",
+        "resolution": "#image.width#",
+        "image": [
+          "1",
+          0
+        ]
+      },
+      "class_type": "FakeScribblePreprocessor"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "config": {
+    "label": "Preporcess PiDiNet",
+    "mode": "single"
+  },
+  "variables": {
+    "safe": {
+      "type": "combo",
+      "options": [
+        "enable",
+        "disable"
+      ],
+      "label": "Safe",
+      "value": "enable"
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "75": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "77": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "78",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "78": {
+      "inputs": {
+        "safe": "#safe#",
+        "resolution": "#image.width#",
+        "image": [
+          "75",
+          0
+        ]
+      },
+      "class_type": "PiDiNetPreprocessor"
+    }
+  }
+}

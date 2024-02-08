@@ -1,0 +1,38 @@
+{
+  "config": {
+    "label": "Preporcess Color Palette",
+    "mode": "single"
+  },
+  "variables": {
+    "advanced": {}
+  },
+  "prompt": {
+    "75": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "77": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "80",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "80": {
+      "inputs": {
+        "resolution": "#image.width#",
+        "image": [
+          "75",
+          0
+        ]
+      },
+      "class_type": "ColorPreprocessor"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "config": {
+    "label": "Preporcess HED",
+    "mode": "single"
+  },
+  "variables": {
+    "safe": {
+      "type": "combo",
+      "options": [
+        "enable",
+        "disable"
+      ],
+      "label": "Safe",
+      "value": "enable"
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "1": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "47": {
+      "inputs": {
+        "safe": "#safe#",
+        "resolution": "#image.width#",
+        "image": [
+          "1",
+          0
+        ]
+      },
+      "class_type": "HEDPreprocessor"
+    },
+    "48": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "47",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    }
+  }
+}

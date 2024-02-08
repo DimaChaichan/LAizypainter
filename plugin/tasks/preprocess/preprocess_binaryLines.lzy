@@ -1,0 +1,45 @@
+{
+  "config": {
+    "label": "Preporcess Binary Lines",
+    "mode": "single"
+  },
+  "variables": {
+    "bin_threshold": {
+      "type": "slider",
+      "label": "Bin Threshold",
+      "value": 100,
+      "max": 1000
+    },
+    "advanced": {}
+  },
+  "prompt": {
+    "75": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "77": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "79",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "79": {
+      "inputs": {
+        "bin_threshold": "#bin_threshold#",
+        "resolution": "#image.width#",
+        "image": [
+          "75",
+          0
+        ]
+      },
+      "class_type": "BinaryPreprocessor"
+    }
+  }
+}
