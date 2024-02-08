@@ -46,7 +46,8 @@ export function HistoryImage(props: {
             style={{
                 height: size + "px",
                 width: size + "px",
-                position: "relative"
+                position: "relative",
+                overflow: "hidden"
             }} className="theme-border">
             <Image url={`${state.serverUrl}/view?${url_values}`} onPlaceToLayerCLick={handleAddAsLayerClick}/>
         </div>)

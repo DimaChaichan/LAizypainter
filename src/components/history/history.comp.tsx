@@ -65,7 +65,7 @@ export function History() {
                                             alignItems: "center",
                                             justifyContent: "center"
                                         }}>
-                                            <sp-body size="XS">No History exist!</sp-body>
+                                            <sp-body size="XS">No more History exist!</sp-body>
                                         </div>
                                     }
                                 </>
