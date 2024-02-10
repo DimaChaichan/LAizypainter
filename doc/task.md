@@ -2,8 +2,7 @@
 
 ### Base
 #### Text to Image
-Example file: [tex2img.lzy](..%2Fplugin%2Fta
-sks%2Ftex2img.lzy) \
+Example file: [tex2img.lzy](..%2Fplugin%2Fta sks%2Ftex2img.lzy) \
 Text to Image. \
 Node Requirements: none
 ![tex2img.png](..%2Fplugin%2Ftasks%2Ftex2img.png)
@@ -35,6 +34,30 @@ Node Requirements: none
 Example file: [img2img.lzy](..%2Fplugin%2Ftasks%2Fipadapter%2Fimg2img.lzy) \
 IPAdapter with Img2Img based on a selected Layer. \
 Node Requirements: [ComfyUI IPAdapter plus](https://github.com/cubiq/ComfyUI_IPAdapter_plus)
+
+#### IPAdapter Controlnet
+Example file: [ipadapter_controlnet.lzy](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_controlnet.lzy)\
+IPAdapter with controlnet, with a reference Layer. \
+Node Requirements:  [ComfyUI IPAdapter plus](https://github.com/cubiq/ComfyUI_IPAdapter_plus)
+![ipadapter_controlnet.png](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_controlnet.png)
+
+#### IPAdapter Face
+Example file: [ipadapter_face.lzy](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_face.lzy)\
+IPAdapter with [Face Swap](https://github.com/cubiq/ComfyUI_IPAdapter_plus?tab=readme-ov-file#ipadapter-face) , with a reference Layer. \
+Node Requirements:  [ComfyUI IPAdapter plus](https://github.com/cubiq/ComfyUI_IPAdapter_plus)
+![ipadapter_face.png](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_face.png)
+
+#### IPAdapter Inpaint
+Example file: [ipadapter_inpaint.lzy](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_inpaint.lzy)\
+IPAdapter with inpaint function, use a reference Layer. \
+Node Requirements:  [ComfyUI IPAdapter plus](https://github.com/cubiq/ComfyUI_IPAdapter_plus)
+![ipadapter_inpaint.png](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_inpaint.png)
+
+#### IPAdapter Batch
+Example file: [ipadapter_batch.lzy](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_batch.lzy)\
+IPAdapter with inpaint function, use a reference Layer. \
+Node Requirements:  [ComfyUI IPAdapter plus](https://github.com/cubiq/ComfyUI_IPAdapter_plus)
+![ipadapter_batch.png](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_batch.png)
 
 ### ICM
 #### ICM Text to Image

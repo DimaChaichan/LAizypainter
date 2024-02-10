@@ -33,8 +33,11 @@ export function History() {
                                 const outputsNodes = Object.keys(session.outputs);
                                 return (<>
                                     {outputsNodes.map(node => {
+                                        const images = session.outputs[node].images;
+                                        if (!images)
+                                            return null
                                         return session.outputs[node].images.map((image: any) => {
-                                            if(image.type !== "output")
+                                            if (image.type !== "output")
                                                 return null
                                             if (loadingCounter >= loadingIndex + loadingBatchCount)
                                                 return null;
