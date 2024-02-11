@@ -2,7 +2,7 @@
 
 ### Base
 #### Text to Image
-Example file: [tex2img.lzy](..%2Fplugin%2Fta sks%2Ftex2img.lzy) \
+Example file: [tex2img.lzy](..%2Fplugin%2Ftasks%2Ftex2img.lzy) \
 Text to Image. \
 Node Requirements: none
 ![tex2img.png](..%2Fplugin%2Ftasks%2Ftex2img.png)
