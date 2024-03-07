@@ -49,7 +49,7 @@ settings:
 - **min:** integer
 - **max:** integer
 - **step:** integer
-- **restore:** true | false: restore last saved value[ipadapter_im2img](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_im2img)
+- **restore:** true | false: restore last saved value [ipadapter_im2img](..%2Fplugin%2Ftasks%2Fipadapter%2Fipadapter_im2img)
 
 ### Seed
 type: seed \
@@ -68,7 +68,7 @@ settings:
 - **restore:** true | false: restore last saved value
 
 ### Model Combo
-type: model | clip | clipVision | controlnet | diffusers | embeddings | gligen | hypernetworks | loras, | styleModels, | upscaleModels, | vae \
+type: model | clip | clipVision | controlNet | diffusers | embeddings | gligen | hypernetworks | loras, | styleModels, | upscaleModels, | vae \
 settings: 
 - **value:** string
 - **label:** Variable label

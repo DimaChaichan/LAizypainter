@@ -1,1 +1,296 @@
-{"config":{"label":"Ipadapter Face","mode":"loop"},"variables":{"positive":{"type":"textarea","label":"Positive Prompt:","value":"a cute cat"},"negative":{"type":"text","label":"Negative Prompt:","value":"text, watermark"},"layer":{"type":"layer","label":"Reference Layer:"},"IPAdapterWeight ":{"type":"slider","label":"IPAdapter Weight:","value":1,"min":0,"max":1,"step":0.01},"IPAdapterNoise":{"type":"slider","label":"IPAdapter Noise:","value":0,"min":0,"max":1,"step":0.01},"IPAdapterStart":{"type":"slider","label":"IPAdapter Start:","value":0,"max":1,"step":0.01},"IPAdapterEnd":{"type":"slider","label":"IPAdapter End:","value":1,"max":1,"step":0.01},"denoise":{"type":"slider","label":"Denoise:","value":0.8,"max":1,"step":0.01},"advanced":{"row1":{"type":"row","seed":{"type":"seed","label":"Seed:","value":-2,"restore":false},"steps":{"type":"number","label":"Steps:","value":20,"restore":false}},"row2":{"type":"row","cfg":{"type":"number","label":"CFG:","value":8,"restore":false},"sampler":{"type":"combo","options":["euler","euler_ancestral","heun","heunpp2","dpm_2","dpm_2_ancestral","lms","dpm_fast","dpm_adaptive","dpmpp_2s_ancestral","dpmpp_sde","dpmpp_sde_gpu","dpmpp_2m","dpmpp_2m_sde","dpmpp_2m_sde_gpu","dpmpp_3m_sde","dpmpp_3m_sde_gpu","ddpm","lcm","ddim"],"label":"Sampler:","value":"ddim","restore":false},"scheduler":{"type":"combo","options":["normal","karras","exponential","sgm_uniform","simple","ddim_uniform"],"label":"scheduler:","value":"ddim_uniform","restore":false}},"model":{"type":"model","label":"Model:","value":"sd_xl_base_1.0.safetensors"},"IPAdapterClipVision":{"type":"clipVision","label":"IPAdapter Clip Vision","value":"defaultValue"},"IPAdapterModel":{"type":"combo","options":["ip-adapter-plus_sdxl_vit-h.bin","ip-adapter_sdxl.bin","ip-adapter_sdxl_vit-h.bin","ip-adapter-plus-face_sdxl_vit-h.safetensors"],"label":"IPAdapter Model","value":"ip-adapter-plus-face_sdxl_vit-h.safetensors"}}},"prompt":{"1":{"inputs":{"ckpt_name":"#model#"},"class_type":"CheckpointLoaderSimple"},"3":{"inputs":{"ipadapter_file":"#IPAdapterModel#"},"class_type":"IPAdapterModelLoader"},"4":{"inputs":{"clip_name":"#IPAdapterClipVision#"},"class_type":"CLIPVisionLoader"},"5":{"inputs":{"weight":"#IPAdapterWeight #","noise":"#IPAdapterNoise#","weight_type":"original","start_at":"#IPAdapterStart#","end_at":"#IPAdapterEnd#","unfold_batch":"","ipadapter":["3",0],"clip_vision":["4",0],"image":["19",0],"model":["1",0]},"class_type":"IPAdapterApply"},"7":{"inputs":{"text":"#positive#","clip":["1",1]},"class_type":"CLIPTextEncode"},"8":{"inputs":{"text":"#negative#","clip":["1",1]},"class_type":"CLIPTextEncode"},"9":{"inputs":{"seed":"#seed#","steps":"#steps#","cfg":"#cfg#","sampler_name":"#sampler#","scheduler":"#scheduler#","denoise":"#denoise#","model":["5",0],"positive":["7",0],"negative":["8",0],"latent_image":["22",0]},"class_type":"KSampler"},"11":{"inputs":{"samples":["9",0],"vae":["1",2]},"class_type":"VAEDecode"},"12":{"inputs":{"filename_prefix":"IPAdapter","images":["11",0]},"class_type":"SaveImage"},"19":{"inputs":{"image":"#layer#","upload":"image"},"class_type":"LoadImage"},"22":{"inputs":{"pixels":["23",0],"vae":["1",2]},"class_type":"VAEEncode"},"23":{"inputs":{"image":"#image#","upload":"image"},"class_type":"LoadImage"}}}
+{
+  "config": {
+    "label": "Ipadapter Face",
+    "mode": "loop"
+  },
+  "variables": {
+    "positive": {
+      "type": "textarea",
+      "label": "Positive Prompt:",
+      "value": "a cute cat"
+    },
+    "negative": {
+      "type": "text",
+      "label": "Negative Prompt:",
+      "value": "text, watermark"
+    },
+    "layer": {
+      "type": "layer",
+      "label": "Reference Layer:"
+    },
+    "IPAdapterWeight ": {
+      "type": "slider",
+      "label": "IPAdapter Weight:",
+      "value": 1,
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    "IPAdapterNoise": {
+      "type": "slider",
+      "label": "IPAdapter Noise:",
+      "value": 0,
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    "IPAdapterStart": {
+      "type": "slider",
+      "label": "IPAdapter Start:",
+      "value": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    "IPAdapterEnd": {
+      "type": "slider",
+      "label": "IPAdapter End:",
+      "value": 1,
+      "max": 1,
+      "step": 0.01
+    },
+    "denoise": {
+      "type": "slider",
+      "label": "Denoise:",
+      "value": 0.8,
+      "max": 1,
+      "step": 0.01
+    },
+    "advanced": {
+      "row1": {
+        "type": "row",
+        "seed": {
+          "type": "seed",
+          "label": "Seed:",
+          "value": -2,
+          "restore": false
+        },
+        "steps": {
+          "type": "number",
+          "label": "Steps:",
+          "value": 20,
+          "restore": false
+        }
+      },
+      "row2": {
+        "type": "row",
+        "cfg": {
+          "type": "number",
+          "label": "CFG:",
+          "value": 8,
+          "restore": false
+        },
+        "sampler": {
+          "type": "combo",
+          "options": [
+            "euler",
+            "euler_ancestral",
+            "heun",
+            "heunpp2",
+            "dpm_2",
+            "dpm_2_ancestral",
+            "lms",
+            "dpm_fast",
+            "dpm_adaptive",
+            "dpmpp_2s_ancestral",
+            "dpmpp_sde",
+            "dpmpp_sde_gpu",
+            "dpmpp_2m",
+            "dpmpp_2m_sde",
+            "dpmpp_2m_sde_gpu",
+            "dpmpp_3m_sde",
+            "dpmpp_3m_sde_gpu",
+            "ddpm",
+            "lcm",
+            "ddim"
+          ],
+          "label": "Sampler:",
+          "value": "ddim",
+          "restore": false
+        },
+        "scheduler": {
+          "type": "combo",
+          "options": [
+            "normal",
+            "karras",
+            "exponential",
+            "sgm_uniform",
+            "simple",
+            "ddim_uniform"
+          ],
+          "label": "scheduler:",
+          "value": "ddim_uniform",
+          "restore": false
+        }
+      },
+      "model": {
+        "type": "model",
+        "label": "Model:",
+        "value": "sd_xl_base_1.0.safetensors"
+      },
+      "IPAdapterClipVision": {
+        "type": "clipVision",
+        "label": "IPAdapter Clip Vision",
+        "value": "defaultValue"
+      },
+      "IPAdapterModel": {
+        "type": "combo",
+        "options": [
+          "ip-adapter-full-face_sd15.bin",
+          "ip-adapter-plus-face_sd15.bin",
+          "ip-adapter-plus-face_sdxl_vit-h.bin",
+          "ip-adapter-plus_sd15.bin",
+          "ip-adapter-plus_sdxl_vit-h.bin",
+          "ip-adapter_sd15.bin",
+          "ip-adapter_sd15_light.safetensors",
+          "ip-adapter_sd15_vit-G.bin"
+        ],
+        "label": "IPAdapter Model",
+        "value": "ip-adapter-plus-face_sdxl_vit-h.bin"
+      }
+    }
+  },
+  "prompt": {
+    "1": {
+      "inputs": {
+        "ckpt_name": "#model#"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
+    "3": {
+      "inputs": {
+        "ipadapter_file": "#IPAdapterModel#"
+      },
+      "class_type": "IPAdapterModelLoader"
+    },
+    "4": {
+      "inputs": {
+        "clip_name": "#IPAdapterClipVision#"
+      },
+      "class_type": "CLIPVisionLoader"
+    },
+    "5": {
+      "inputs": {
+        "weight": "#IPAdapterWeight #",
+        "noise": "#IPAdapterNoise#",
+        "weight_type": "original",
+        "start_at": "#IPAdapterStart#",
+        "end_at": "#IPAdapterEnd#",
+        "unfold_batch": "",
+        "ipadapter": [
+          "3",
+          0
+        ],
+        "clip_vision": [
+          "4",
+          0
+        ],
+        "image": [
+          "19",
+          0
+        ],
+        "model": [
+          "1",
+          0
+        ]
+      },
+      "class_type": "IPAdapterApply"
+    },
+    "7": {
+      "inputs": {
+        "text": "#positive#",
+        "clip": [
+          "1",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "8": {
+      "inputs": {
+        "text": "#negative#",
+        "clip": [
+          "1",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "9": {
+      "inputs": {
+        "seed": "#seed#",
+        "steps": "#steps#",
+        "cfg": "#cfg#",
+        "sampler_name": "#sampler#",
+        "scheduler": "#scheduler#",
+        "denoise": "#denoise#",
+        "model": [
+          "5",
+          0
+        ],
+        "positive": [
+          "7",
+          0
+        ],
+        "negative": [
+          "8",
+          0
+        ],
+        "latent_image": [
+          "22",
+          0
+        ]
+      },
+      "class_type": "KSampler"
+    },
+    "11": {
+      "inputs": {
+        "samples": [
+          "9",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ]
+      },
+      "class_type": "VAEDecode"
+    },
+    "12": {
+      "inputs": {
+        "filename_prefix": "IPAdapter",
+        "images": [
+          "11",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "19": {
+      "inputs": {
+        "image": "#layer#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "22": {
+      "inputs": {
+        "pixels": [
+          "23",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ]
+      },
+      "class_type": "VAEEncode"
+    },
+    "23": {
+      "inputs": {
+        "image": "#image#",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    }
+  }
+}

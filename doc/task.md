@@ -3,7 +3,7 @@
 ### Base
 #### Text to Image
 Example file: [tex2img.lzy](..%2Fplugin%2Ftasks%2Ftex2img.lzy) \
-Text to Image. \
+Text to Image. The image have the document size. \
 Node Requirements: none
 ![tex2img.png](..%2Fplugin%2Ftasks%2Ftex2img.png)
 
@@ -77,7 +77,7 @@ Node Requirements: none
 
 ### Inpaint
 #### Inpaint 
-Example file: [inpaint.lzy](..%2Fplu gin%2Ftasks%2Finp aint%2Finpaint.lzy) \
+Example file: [inpaint.lzy](..%2Fplu gin%2Ftasks%2Finpaint%2Finpaint.lzy) \
 Use the document with the mask for inpainting. \
 Node Requirements: none 
 ![inpaint.png](..%2Fplugin%2Ftasks%2Finpaint%2Finpaint.png)
