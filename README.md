@@ -13,6 +13,10 @@ It is recommended to use LCM Models to get fast (near real-time) results.
 # ![Demo 1](./assets/demo_1.gif)
 # ![Demo 2](./assets/demo_2.gif)
 
+### Known problems
+Currently there is a problem with the ComboBoxes under windows, this is an Adobe UXP problem. I'll wait a little longer to see if there is a workaround before I rebuild the ComboBoxes.
+https://forums.creativeclouddeveloper.com/t/sp-textfield-in-sp-popover-not-fireevents-windows-only/7631
+
 ### Requirements
 Min. Photoshop version: 25.0.0 (September 2023)\
 The Plugin need the [Permissions](https://developer.adobe.com/photoshop/uxp/2022/guides/uxp_guide/uxp-misc/manifest-v5) localFileSystem:request and network:domains:all. \
