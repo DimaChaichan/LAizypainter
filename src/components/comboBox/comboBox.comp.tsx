@@ -95,18 +95,32 @@ function ComboBox(props: {
         };
     },)
 
+    const closeMenu = () => {
+        popoverRef.current.style.display = "none";
+        document.body.classList.remove("hide-textfield");
+    }
+
     const handleOnclickOpenCloseBtn = () => {
         if (searchFieldRef.current) {
             setQuery("");
         }
         setHoverIndex(-1);
         setMenuWidth(getMenuWidth());
-        popoverRef.current?.setAttribute("open", "true");
+
+        popoverRef.current.style.top = `${popoverRef.current.parentElement.offsetTop + 24}px`
+        if (popoverRef.current.style.display === "none") {
+            popoverRef.current.style.display = "block";
+            document.body.classList.add("hide-textfield");
+        }
+        else {
+            closeMenu();
+        }
+
         props.onOpen?.();
     };
     const handleOnClickMenuItem = (index: number) => {
-        popoverRef.current?.removeAttribute("open");
         setSelectedIndex(index)
+        closeMenu();
 
         const optionIndex = props.options[index];
         setValue(optionIndex)
@@ -122,75 +136,70 @@ function ComboBox(props: {
     return (
         <div ref={ref} style={props.style}>
             <div ref={containerRef} style={{width: "100%", minHeight: "33px"}}>
+                <div
+                    className="theme-border theme-background"
+                    ref={popoverRef}
+                    style={{
+                        top: 0,
+                        position: "absolute",
+                        display: "none"
+                    }}>
+                    <sp-textfield ref={searchFieldRef}
+                                  className="combobox-menu-search"
+                                  type="search"
+                                  placeholder="Search..."
+                                  style={{paddingLeft: '2px', width: '100%'}}
+                                  value={query}
+                                  onInput={handleOnInputSearch}
+                    />
+                    <div
+                        style={{
+                            width: menuWidth,
+                            maxHeight: "300px",
+                            overflow: "auto"
+                        }}>
+                        <div className={"auto-menu"}>
+                            {
+                                props.options.map((option, index) => {
+                                    if (option === "divider")
+                                        return (<>
+                                            <sp-menu-divider></sp-menu-divider>
+                                        </>)
+                                    else if (typeof option === "object"
+                                        && option.hasOwnProperty("label")
+                                        && !option.hasOwnProperty("value")) {
+                                        return (<>
+                                            <sp-label style={{paddingLeft: '5px'}} size="S"
+                                                      slot="description">{option.label}
+                                            </sp-label>
+                                            <sp-menu-divider></sp-menu-divider>
+                                        </>)
+                                    } else if (typeof option === "object"
+                                        && option.hasOwnProperty("label")
+                                        && option.hasOwnProperty("value")
+                                        && (option as ComboBoxItem).label.toLowerCase().includes(query.toLowerCase()))
+                                        return (<sp-menu-item
+                                            selected={selectedIndex !== -1 && selectedIndex === index ? true : null}
+                                            className={`auto-menu-item ${hoverIndex === index ? 'selected' : ''}`}
+                                            onClick={() => handleOnClickMenuItem(index)}
+                                        > {option.label}
+                                        </sp-menu-item>)
+                                    else if (typeof option === "string" &&
+                                        option.toLowerCase().includes(query.toLowerCase()))
+                                        return (<sp-menu-item
+                                            selected={selectedIndex !== -1 && selectedIndex === index ? true : null}
+                                            className={`auto-menu-item ${hoverIndex === index ? 'selected' : ''}`}
+                                            onClick={() => handleOnClickMenuItem(index)}
+                                        > {option}
 
-                <sp-overlay style={{
-                    transform: "translateY(15px)",
-                    height: "0"
-                }}>
-                    <sp-popover
-                        ref={popoverRef}
-                        placement="auto"
-                        alignment="auto"
-                        slot="click"
-
-                        appearance="none">
-                        <sp-textfield ref={searchFieldRef}
-                                      type="search"
-                                      placeholder="Search..."
-                                      style={{paddingLeft: '2px', width: '100%'}}
-                                      value={query}
-                                      onInput={handleOnInputSearch}
-                        />
-                        <div
-                            style={{
-                                width: menuWidth,
-                                maxHeight: "300px",
-                                overflow: "auto"
-                            }}>
-                            <div className={"auto-menu"}>
-                                {
-                                    props.options.map((option, index) => {
-                                        if (option === "divider")
-                                            return (<>
-                                                <sp-menu-divider></sp-menu-divider>
-                                            </>)
-                                        else if (typeof option === "object"
-                                            && option.hasOwnProperty("label")
-                                            && !option.hasOwnProperty("value")) {
-                                            return (<>
-                                                <sp-label style={{paddingLeft: '5px'}} size="S"
-                                                          slot="description">{option.label}
-                                                </sp-label>
-                                                <sp-menu-divider></sp-menu-divider>
-                                            </>)
-                                        } else if (typeof option === "object"
-                                            && option.hasOwnProperty("label")
-                                            && option.hasOwnProperty("value")
-                                            && (option as ComboBoxItem).label.toLowerCase().includes(query.toLowerCase()))
-                                            return (<sp-menu-item
-                                                selected={selectedIndex !== -1 && selectedIndex === index ? true : null}
-                                                className={`auto-menu-item ${hoverIndex === index ? 'selected' : ''}`}
-                                                onClick={() => handleOnClickMenuItem(index)}
-                                            > {option.label}
-                                            </sp-menu-item>)
-                                        else if (typeof option === "string" &&
-                                            option.toLowerCase().includes(query.toLowerCase()))
-                                            return (<sp-menu-item
-                                                selected={selectedIndex !== -1 && selectedIndex === index ? true : null}
-                                                className={`auto-menu-item ${hoverIndex === index ? 'selected' : ''}`}
-                                                onClick={() => handleOnClickMenuItem(index)}
-                                            > {option}
-
-                                            </sp-menu-item>)
-                                        else
-                                            return null;
-                                    })
-                                }
-                            </div>
+                                        </sp-menu-item>)
+                                    else
+                                        return null;
+                                })
+                            }
                         </div>
-                    </sp-popover>
-                    <div slot="trigger"></div>
-                </sp-overlay>
+                    </div>
+                </div>
 
                 <div style={{
                     display: "flex",

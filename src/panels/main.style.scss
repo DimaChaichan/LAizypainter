@@ -14,6 +14,10 @@ div[panelcontentid="main"] {
   @include theme-border-color;
 }
 
+.theme-background {
+  @include theme-background;
+}
+
 .theme-background-textfield {
   @include theme-background-textfield;
 }
@@ -24,4 +28,13 @@ div[panelcontentid="main"] {
 
 .theme-border-warning {
   @include theme-border-color-warning;
+}
+
+.hide-textfield {
+  sp-textfield {
+    opacity: 0;
+  }
+  sp-textarea {
+    opacity: 0;
+  }
 }

@@ -1,5 +1,9 @@
 @import '../../scss/_mixin.scss';
 
+.combobox-menu-search {
+  opacity: 1 !important;
+}
+
 .auto-menu-item.selected {
   background: white;
   @include theme-background-selected;
@@ -14,4 +18,3 @@
     bottom: 0;
   }
 }
-
