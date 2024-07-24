@@ -13,7 +13,8 @@ export function createAppState() {
     const debug = signal(false);
 
     const server = new Server();
-    const serverUrl = signal('http://127.0.0.1:8188');
+    const lastServerConnectURL = localStorage.getItem("lastServerConnectURL");
+    const serverUrl = signal(lastServerConnectURL ? lastServerConnectURL : 'http://127.0.0.1:8188');
     const serverStatus = signal<EServerStatus>(EServerStatus.disconnected);
 
     const loopStatus = signal<ELoopStatus>(ELoopStatus.stop);
@@ -106,6 +107,7 @@ export function createAppState() {
             return
         serverUrl.value = url;
         server.connect(url);
+        localStorage.setItem("lastServerConnectURL", url)
     }
     const disconnectServer = () => {
         setTask(undefined);

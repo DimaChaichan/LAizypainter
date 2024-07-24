@@ -1,7 +1,7 @@
 {
   "id": "com.demeter.chaichan.laizypainter",
   "name": "LAizypainter",
-  "version": "0.0.1",
+  "version": "0.0.31",
   "main": "index.js",
   "manifestVersion": 5,
   "host": [

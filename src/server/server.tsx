@@ -1,8 +1,8 @@
 import {EImageComfy, ELoopStatus, EModelsConfig, EServerStatus, ETaskConfig, ETaskStatus} from "../store/store.tsx";
-import {action, app, core, imaging} from "photoshop";
+import {app, core, imaging} from "photoshop";
 import {
     createFileInDataFolder, findVal,
-    findValAndReplace, getAllLayer, getDocumentByID, getLayerByID,
+    findValAndReplace, getAllLayer, getDocumentByID, getLayerByID, getSelection,
     map,
     randomSeed,
     serializeImageComfyData
@@ -488,7 +488,7 @@ export class Server {
     }
 
     private async uploadSelectionDocumentImage(name: string, documentID: number) {
-        const selection: any = await this.getSelection();
+        const selection: any = await getSelection();
         const image = await this.createImage(documentID, {})
 
         const selectMaskDataResult = await imaging.getSelection({
@@ -728,43 +728,6 @@ export class Server {
         return true;
     }
 
-    private async getSelection() {
-        let selection: any;
-        await core.executeAsModal(async () => {
-                const result = await action.batchPlay(
-                    [
-                        {
-                            "_obj": "get",
-                            "_target": [
-                                {
-                                    "_property": "selection"
-                                },
-                                {
-                                    "_ref": "document",
-                                    "_id": app.activeDocument.id
-                                }
-                            ],
-                            "_options": {
-                                "dialogOptions": "dontDisplay"
-                            }
-                        }
-                    ],
-                    {
-                        modalBehavior: "execute"
-                    })
-                selection = result.length ? result[0].selection : undefined;
-            },
-            {"commandName": `Get selection Infos`})
-        if (selection) {
-            selection.left = selection.left._value;
-            selection.right = selection.right._value;
-            selection.top = selection.top._value;
-            selection.bottom = selection.bottom._value;
-            selection.width = selection.right - selection.left;
-            selection.height = selection.bottom - selection.top;
-        }
-        return selection;
-    }
 
     private async createPromptTask() {
         if (!this.validatePromptTask()) {
@@ -778,7 +741,7 @@ export class Server {
             if (app.activeDocument.height > app.activeDocument.width)
                 size = {height: imageMaxSize}
 
-            let selection: any = await this.getSelection();
+            let selection: any = await getSelection();
             if (findVal(this.task, '#image#')) {
                 const responseUpload = await this.uploadImage(
                     this.getImageName(),

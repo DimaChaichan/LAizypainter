@@ -49,7 +49,7 @@ export async function placeFileAsLayer(file: storage.File) {
     //@ts-ignore
     const token = storage.localFileSystem.createSessionToken(file);
     await core.executeAsModal(async () => {
-            await action.batchPlay([
+            const result = await action.batchPlay([
                     {
                         _obj: "placeEvent",
                         ID: 5,
@@ -65,6 +65,9 @@ export async function placeFileAsLayer(file: storage.File) {
                 {
                     modalBehavior: "execute"
                 })
+            const res = findLayer(result[0].ID);
+            if (res)
+                await translateToZero(res);
         },
         {"commandName": `Place File`})
 }
@@ -205,10 +208,31 @@ export async function placeComfyImageAsLayer(image: EImageComfy | undefined, nam
         return
     const blob = await state.getHistoryImage(image)
     if (blob) {
+        const doc = app.activeDocument;
         const arrayBuffer = new Uint8Array(await blob?.arrayBuffer());
         const tmpFile = await createFileInDataFolder(name + '.png')
         await tmpFile.write(arrayBuffer)
+        const selection: any = await getSelection();
+
+        if (selection) {
+            await core.executeAsModal(async () => {
+                    await doc.selection.save("lastSelection");
+                },
+                {"commandName": `Save Selection`})
+        }
         await placeFileAsLayer(tmpFile);
+        if (selection) {
+            await core.executeAsModal(async () => {
+                    for (let i = 0; i < doc.channels.length; i++) {
+                        const channel = doc.channels[i];
+                        if (channel.name === "lastSelection") {
+                            await doc.selection.load(channel);
+                            await channel.remove()
+                        }
+                    }
+                },
+                {"commandName": `Restore Selection`})
+        }
     }
 }
 
@@ -310,6 +334,97 @@ function _flattLayers(layers: Layers, res: Array<Layer>, kind?: LayerKind): Arra
     return res;
 }
 
+/**
+ * Translate Layer to Zero
+ * @param layer
+ */
+export async function translateToZero(layer: Layer) {
+    await core.executeAsModal(async () => {
+        await layer.translate(
+            layer.bounds.left * -1,
+            layer.bounds.top * -1)
+    }, {
+        commandName: `Translate Layer to Zero`
+    })
+}
+
+/**
+ * Get Selection
+ */
+export async function getSelection() {
+    let selection: any;
+    await core.executeAsModal(async () => {
+            const result = await action.batchPlay(
+                [
+                    {
+                        "_obj": "get",
+                        "_target": [
+                            {
+                                "_property": "selection"
+                            },
+                            {
+                                "_ref": "document",
+                                "_id": app.activeDocument.id
+                            }
+                        ],
+                        "_options": {
+                            "dialogOptions": "dontDisplay"
+                        }
+                    }
+                ],
+                {
+                    modalBehavior: "execute"
+                })
+            selection = result.length ? result[0].selection : undefined;
+        },
+        {"commandName": `Get selection Infos`})
+    if (selection) {
+        selection.left = selection.left._value;
+        selection.right = selection.right._value;
+        selection.top = selection.top._value;
+        selection.bottom = selection.bottom._value;
+        selection.width = selection.right - selection.left;
+        selection.height = selection.bottom - selection.top;
+    }
+    return selection;
+}
+
+/**
+ * Find a Layer
+ * @param query a Layer-name or LayerID
+ * @param recursive
+ * @param rootLayer search from this Layer
+ * @param document set the document for the Layer, without use activeDocument
+ */
+export function findLayer(query: string | number, recursive: boolean = true, rootLayer?: Layer, document?: Document) {
+    let layers = rootLayer?.layers;
+    if (!layers)
+        layers = document ? document.layers : app.activeDocument.layers;
+    return _layerFind(layers, query, recursive);
+}
+
+/**
+ * Find a Layer recursive
+ * @param layers
+ * @param query
+ * @param recursive
+ * @private
+ */
+function _layerFind(layers: Layers, query: string | number, recursive: boolean): Layer | undefined {
+    for (let i = 0; i < layers.length; i++) {
+        const layer = layers[i];
+        if (typeof (query) === "string" && layer.name === query)
+            return layer;
+        if (typeof (query) === "number" && layer.id === query)
+            return layer;
+        if (recursive && layer.layers) {
+            let childLayer = _layerFind(layer.layers, query, recursive);
+            if (childLayer)
+                return childLayer;
+        }
+    }
+    return undefined;
+}
 
 // #######################################################
 // Interface

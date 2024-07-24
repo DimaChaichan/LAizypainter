@@ -1,8 +1,9 @@
 import {useContext} from "react";
 import {AppState} from "../../main.tsx";
 import CollapseContainer from "../collapseContainer/collapseContainer.comp.tsx";
-import {createFileInDataFolder, placeFileAsLayer} from "../../utils.tsx";
+import {createFileInDataFolder, placeFileAsLayer, getSelection} from "../../utils.tsx";
 import {Image} from "./image.comp.tsx";
+import {app, core} from "photoshop";
 
 export function ImagePreview() {
     const state = useContext(AppState);
@@ -12,7 +13,28 @@ export function ImagePreview() {
         const arrayBuffer = new Uint8Array(await state.previewImageBlob.value?.arrayBuffer());
         const tmpFile = await createFileInDataFolder('Preview.png')
         await tmpFile.write(arrayBuffer)
+
+        const doc = app.activeDocument;
+        const selection: any = await getSelection();
+        if (selection) {
+            await core.executeAsModal(async () => {
+                    await doc.selection.save("lastSelection");
+                },
+                {"commandName": `Save Selection`})
+        }
         await placeFileAsLayer(tmpFile);
+        if (selection) {
+            await core.executeAsModal(async () => {
+                    for (let i = 0; i < doc.channels.length; i++) {
+                        const channel = doc.channels[i];
+                        if(channel.name === "lastSelection"){
+                            await doc.selection.load(channel);
+                            await channel.remove()
+                        }
+                    }
+                },
+                {"commandName": `Restore Selection`})
+        }
     };
 
     return (
