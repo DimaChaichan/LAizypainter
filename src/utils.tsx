@@ -1,6 +1,6 @@
 import {storage} from "uxp";
 import CryptoJS from "crypto-js";
-import {action, app, core} from "photoshop";
+import {action, app, core, constants} from "photoshop";
 import Mexp from "math-expression-evaluator";
 import {EImageComfy} from "./store/store.tsx";
 import {ITaskVariable} from "./components/taskvariables/taskVariable.comp.tsx";
@@ -339,13 +339,27 @@ function _flattLayers(layers: Layers, res: Array<Layer>, kind?: LayerKind): Arra
  * @param layer
  */
 export async function translateToZero(layer: Layer) {
-    await core.executeAsModal(async () => {
-        await layer.translate(
-            layer.bounds.left * -1,
-            layer.bounds.top * -1)
-    }, {
-        commandName: `Translate Layer to Zero`
-    })
+    if (layer.kind === constants.LayerKind.SMARTOBJECT) {
+        const info = await getSmartObjectTransformationInfos(layer)
+        await core.executeAsModal(async () => {
+            // info must be filled! I hope! :D
+            await layer.translate(
+                // @ts-ignore
+                 info?.points?.lowerLeft.x * -1,
+                // @ts-ignore
+                info?.points?.upperLeft.y * -1)
+        }, {
+            commandName: `Translate Layer to Zero`
+        })
+    } else {
+        await core.executeAsModal(async () => {
+            await layer.translate(
+                layer.bounds.left * -1,
+                layer.bounds.top * -1)
+        }, {
+            commandName: `Translate Layer to Zero`
+        })
+    }
 }
 
 /**
@@ -426,9 +440,109 @@ function _layerFind(layers: Layers, query: string | number, recursive: boolean):
     return undefined;
 }
 
+/**
+ * Get Smart Object Transformation infos.
+ * @param layer
+ */
+export async function getSmartObjectTransformationInfos(layer: Layer): Promise<smartInfos | null> {
+    let infos: smartInfos = {
+        rotation: 0,
+        flipX: false,
+        flipY: false,
+        bounds: null,
+        points: null
+    };
+    if (layer.kind !== constants.LayerKind.SMARTOBJECT)
+        return null;
+    await core.executeAsModal(async () => {
+            const result = await action.batchPlay(
+                [
+                    {
+                        "_obj": "get",
+                        "_target": [
+                            {
+                                "_ref": "layer",
+                                "_id": layer.id
+                            },
+                            {
+                                "_ref": "document",
+                                "_id": app.activeDocument.id
+                            }
+                        ],
+                        "_options": {
+                            "dialogOptions": "silent"
+                        }
+                    }
+                ], {
+                    modalBehavior: "execute"
+                });
+
+            const layerInfo = result[0];
+
+            const smartObjectTransform = layerInfo.smartObjectMore.transform;
+            const smartObjectPoints = {
+                upperLeft: {x: smartObjectTransform[0], y: smartObjectTransform[1]},
+                upperRight: {x: smartObjectTransform[2], y: smartObjectTransform[3]},
+                lowerRight: {x: smartObjectTransform[4], y: smartObjectTransform[5]},
+                lowerLeft: {x: smartObjectTransform[6], y: smartObjectTransform[7]}
+            };
+
+            infos.rotation = Math.round(_smartObjectRotationFromCorners(smartObjectPoints));
+            if (smartObjectPoints.upperLeft.x > smartObjectPoints.upperRight.x) {
+                infos.flipX = smartObjectPoints.upperLeft.x > smartObjectPoints.upperRight.x;
+                infos.rotation -= 180;
+            }
+            infos.flipY = smartObjectPoints.upperLeft.y > smartObjectPoints.lowerRight.y;
+            infos.bounds = {
+                top: layerInfo.bounds.top._value,
+                bottom: layerInfo.bounds.bottom._value,
+                left: layerInfo.bounds.left._value,
+                right: layerInfo.bounds.right._value
+            }
+            infos.points = smartObjectPoints;
+        },
+        {"commandName": "Get Smart Object Information's"})
+    return infos;
+}
+
+/**
+ * Get Smart Object Rotations from Corners
+ * @param points
+ * @private
+ */
+function _smartObjectRotationFromCorners(points: {
+    upperLeft: { y: number, x: number }
+    upperRight: { y: number, x: number }
+    lowerRight: { y: number, x: number }
+    lowerLeft: { y: number, x: number }
+}) {
+    const A = points.upperLeft;
+    const B = points.upperRight;
+    const radians = Math.atan2(B.y - A.y, B.x - A.x);
+    return radians * (180 / Math.PI);
+}
+
 // #######################################################
 // Interface
 
 export interface FileWithToken extends storage.File {
     token: string
+}
+
+export type smartInfos = {
+    rotation: number,
+    flipX: boolean,
+    flipY: boolean,
+    bounds: {
+        top: number,
+        bottom: number,
+        left: number,
+        right: number,
+    } | null,
+    points: {
+        upperLeft: { y: number, x: number }
+        upperRight: { y: number, x: number }
+        lowerRight: { y: number, x: number }
+        lowerLeft: { y: number, x: number }
+    } | null
 }
